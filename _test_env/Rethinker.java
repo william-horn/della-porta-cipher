@@ -10,9 +10,47 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-class Essay {
+class Rethinker {
+  final public static String PATH_NAME = "_test_env/";
+
   /*
-   * Test_A1.establishFile(<File> file, <boolean> required)
+   * Rethinker.getFileSource(<File> file):
+   * 
+   * Compile all text source lines in the file into one string
+   * 
+   * @param file: The file object to read and convert to a string
+   * @returns: <String> fileSource
+   */
+  public static String getFileSource(File file) {
+    String source = "";
+
+    try (Scanner reader = new Scanner(file)) {
+      while (reader.hasNextLine()) {
+        source += reader.nextLine() + "\n";
+      }
+
+      return source;
+
+    } catch (IOException e) {
+      System.out.println("Error: " + e.getMessage());
+      return "READ_ERROR";
+    }
+  }
+
+  /*
+   * Rethinker.getPath(<String> path):
+   * 
+   * Get the absolute path based on the PATH_NAME constant defined in the class.
+   * 
+   * @param path: the relative path to the java file being executed
+   * @returns: <String> absolutePath
+   */
+  public static String getPath(String path) {
+    return PATH_NAME + path;
+  }
+
+  /*
+   * Rethinker.establishFile(<File> file, <boolean> required):
    * 
    * Create a file with the given path in the `file` argument, unless it
    * already exists. If the second argument `required` is true, then the
@@ -22,6 +60,7 @@ class Essay {
    * 
    * @param file: The file path to establish
    * @param required: whether or not the file is required for the program to run
+   * @returns: <boolean> newFileWasCreated
    */
   public static boolean establishFile(File file, boolean required) {
     try {
@@ -54,12 +93,13 @@ class Essay {
   }
 
   /*
-   * Test_A1.containsString(<String[]> list, <String> element)
+   * Rethinker.containsString(<String[]> list, <String> element):
    * 
    * Return true if a string array contains a string `element`
    * 
    * @param list: the string array to check
    * @param element: the string to check
+   * @returns: <boolean> isInList
    */
   public static boolean containsString(String[] list, String element) {
     for (String key : list) 
@@ -70,12 +110,14 @@ class Essay {
 
   public static void main(String[] args) {
     // locate input & output files
-    File inputFile = new File("data/input.txt");
-    File outputFile = new File("data/output.txt");
+    File inputFile = new File(getPath("data/input.txt"));
+    File outputFile = new File(getPath("data/output.txt"));
 
-    File happyAdjectivesFile = new File("data/words/happy_adjectives.txt");
-    File sadAdjectivesFile = new File("data/words/sad_adjectives.txt");
-    File angryAdjectivesFile = new File("data/words/angry_adjectives.txt");
+    // locate word files
+    File happyAdjectivesFile = new File(getPath("data/words/happy_adjectives.txt"));
+    File sadAdjectivesFile = new File(getPath("data/words/sad_adjectives.txt"));
+    File angryAdjectivesFile = new File(getPath("data/words/angry_adjectives.txt"));
+    File adjectivesFile = new File(getPath("data/words/adjectives.txt"));
 
     // make sure both input and output files exist before resuming execution
     establishFile(inputFile, true);
@@ -83,10 +125,16 @@ class Essay {
     establishFile(happyAdjectivesFile, true);
     establishFile(sadAdjectivesFile, true);
     establishFile(angryAdjectivesFile, true);
+    establishFile(adjectivesFile, false);
 
     // the source text of the files to read/write to
     String inputSource = "";
     String outputSource = "";
+
+    String[] adjectives = getFileSource(adjectivesFile).split("\n");
+    String[] happyAdjectives = getFileSource(happyAdjectivesFile).split("\n");
+    String[] sadAdjectives = getFileSource(sadAdjectivesFile).split("\n");
+    String[] angryAdjectives = getFileSource(angryAdjectivesFile).split("\n");
 
     // read in the input source text of the input file and assign it to `inputSource`
     try (Scanner reader = new Scanner(inputFile)) {
