@@ -36,9 +36,10 @@ class WilliamHorn_GeometricFigures {
         int shapeChoice = input.nextInt();
 
         // switch cases for different menu items
+        // !note: converted to rule switch (not in submitted assignment)
         switch (shapeChoice) {
           // Shape choice: Sphere
-          case 1: {
+          case 1 -> {
             System.out.println("\nYou choose: Sphere");
             System.out.print("Enter the value of the radius: ");
             double radius = input.nextDouble();
@@ -46,11 +47,10 @@ class WilliamHorn_GeometricFigures {
             double volume = (4*PI*Math.pow(radius, 3))/3;
 
             System.out.println("Volume of the Sphere: " + volume);
-            break;
           }
 
           // Shape choice: Cylinder
-          case 2: {
+          case 2 -> {
             System.out.println("\nYou choose: Cylinder");
             System.out.print("Enter the value of the radius: ");
             double radius = input.nextDouble();
@@ -65,7 +65,7 @@ class WilliamHorn_GeometricFigures {
           }
 
           // Shape choice: Cone
-          case 3: {
+          case 3 -> {
             System.out.println("\nYou choose: Cone");
             System.out.print("Enter the value of the radius: ");
             double radius = input.nextDouble();
@@ -80,8 +80,9 @@ class WilliamHorn_GeometricFigures {
           }
 
           // Case for invalid menu item
-          default:
+          default -> {
             System.out.println("Your entry of: " + shapeChoice + " is not a valid menu item.");
+          }
         }
 
       // Catch if error opening input stream

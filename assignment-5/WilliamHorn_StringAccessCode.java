@@ -39,7 +39,7 @@ class WilliamHorn_StringAccessCode {
 
       // for every 5th cycle in the loop, append a hyphen to the code string
       // this excludes the first cycle of the loop where i <= 0
-      if (i % 5 == 0 && i > 0) code += "-";
+      if (i % 5 == 0) code += "-";
 
       // append the random character
       code += randChar;
