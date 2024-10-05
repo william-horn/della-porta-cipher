@@ -86,7 +86,8 @@ public class WilliamHorn_RockPaperSissorsGame {
    * VISUAL DISPLAY METHODS:
    * 
    * Each of the methods below are exclusively responsible for displaying
-   * text or prompt text to the terminal. They do nothing else.
+   * text or prompt text to the terminal. They do nothing else. I created 
+   * these methods to lessen the clutter in the main logic of the program.
    */
 
   // display the 'select your move' prompt text
@@ -162,6 +163,8 @@ public class WilliamHorn_RockPaperSissorsGame {
     System.out.println("------------------------------");
     System.out.print("Would you like to play again? (y/n): ");
     String answer = input.nextLine();
+    
+    System.out.println("");
     return answer.equals("y");
   }
 

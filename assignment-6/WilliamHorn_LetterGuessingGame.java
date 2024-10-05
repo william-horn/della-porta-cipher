@@ -1,4 +1,12 @@
-
+/*
+ * Author: William J. Horn
+ * Written: 10/4/2024
+ * 
+ * Purpose: Play a letter guessing game with a computer
+ * 
+ * Compilation: javac WilliamHorn_LetterGuessingGame.java
+ * Execution: java WilliamHorn_LetterGuessingGame
+ */
 import java.util.*;
 
 public class WilliamHorn_LetterGuessingGame {
@@ -40,7 +48,7 @@ public class WilliamHorn_LetterGuessingGame {
         }
 
         // prompt the user for playing again
-        System.out.println("Would you like to play again (y = yes, n = no): ");
+        System.out.println("Would you like to play again? (y/n): ");
 
         // determine whether or not to start the game back over
         if (input.nextLine().equals("n")) {
