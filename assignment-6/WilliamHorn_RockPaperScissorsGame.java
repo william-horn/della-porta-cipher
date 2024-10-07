@@ -5,20 +5,18 @@
  * Purpose: Play rock-paper-scissors with a computer.
  * 
  * IMPORTANT:
- * All of the code, the concept, and the documentation is written by me. I'm sorry if 
- * it is extensive, but I really enjoyed working on this assignment. I have prior 
- * knowledge in programming and game development and I love math, so this was an
- * interesting problem.
+ * I have prior programming experience. This was an interesting assignment to me, so I
+ * apologize if this document is unnecessarily extensive.
  * 
- * I have also implemented a similar coding concept to this before, in regards to
+ * I have also written up a similar coding concept to this before, in regards to
  * a Custom Event module I made in Javascript which you can find here: 
  * https://github.com/william-horn/my-web-projects/blob/develop/tools/api/general/js/pseudo-events-2.1.0.js
  * 
- * ...if that is of any interest.
+ * I also made a YouTube video explaining my concept here: https://youtu.be/0J61XpT3dis
  */
 import java.util.*;
 
-public class WilliamHorn_RockPaperSissorsGame {
+public class WilliamHorn_RockPaperScissorsGame {
   /*
    * GAME STATES:
    * 
@@ -163,7 +161,7 @@ public class WilliamHorn_RockPaperSissorsGame {
     System.out.println("------------------------------");
     System.out.print("Would you like to play again? (y/n): ");
     String answer = input.nextLine();
-    
+
     System.out.println("");
     return answer.equals("y");
   }
