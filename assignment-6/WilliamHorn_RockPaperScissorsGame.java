@@ -264,7 +264,7 @@ public class WilliamHorn_RockPaperScissorsGame {
           userRoll[1], 
           computerRoll[1]
         );
-
+        
         /*
          * GAME RESULT DETERMINATION:
          * 
