@@ -1,3 +1,9 @@
+/*
+ * Author: William J. Horn
+ * Written: 10/11/2024
+ * 
+ * Tic Tac Toe game
+ */
 
 // imports
 import java.util.*;
@@ -9,9 +15,72 @@ import java.util.*;
  * executes the game within the main method.
  */
 public class TicTacToe {
+  public static class Player 
+  {
+    public String name = null;
+    public String character = null;
+
+    public void setName(String newName) {
+      name = newName;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setCharacter(String newCharacter) {
+      character = newCharacter;
+    }
+
+    public String getCharacter() {
+      return character;
+    }
+  }
+
+  public static enum GameState 
+  {
+    TIE, 
+    WINNER
+  }
+
+  public static enum MoveValidation 
+  {
+    OUT_OF_BOUNDS,
+    SLOT_TAKEN,
+    IS_VALID,
+    GAME_OVER
+  }
+
+  public static enum NameValidation 
+  {
+    INVALID_LENGTH,
+    INVALID_CHARACTERS,
+    IS_VALID
+  }
+
+  public static enum CharacterValidation 
+  {
+    INVALID_LENGTH,
+    INVALID_CHARACTER,
+    IS_VALID
+  }
+
+  public static enum MoveInputValidation 
+  {
+    INVALID_LENGTH,
+    IS_VALID,
+  }
+
+  public static enum WinType
+  {
+    ROW,
+    COLUMN,
+    DIAGONAL
+  }
 
   // tic-tac-toe game board
-  public static String[][] gameState = {
+  public static String[][] gameGrid = 
+  {
     {null, null, null},
     {null, null, null},
     {null, null, null},
@@ -21,24 +90,24 @@ public class TicTacToe {
   public static ArrayList<Integer> availableRows = new ArrayList<>();
   public static HashMap<Integer, ArrayList<Integer>> availableCols = new HashMap<>();
 
-  // global player settings
-  public static String playerName = null;
-  public static String computerName = "Computer";
+  public static Player Human = new Player();
+  public static Player Computer = new Player();
 
-  // global computer settings
-  public static String playerCharacter = null;
-  public static String computerCharacter = null;
+  public static Player firstPlayer = null;
 
-  public static void main(String[] args) {
-    try (Scanner input = new Scanner(System.in)) {
+  public static void main(String[] args) 
+  {
+    try (Scanner input = new Scanner(System.in)) 
+    {
 
       // display intro message to console
       display__introMessage();
 
       /*
-       * GAME LOOP:
+       * MAIN GAME LOOP:
        * 
-       * Collect game settings from user input
+       * Collect game settings from user input & responsible
+       * for restarting the game cycle.
        */
       while (true) {
         /*
@@ -49,30 +118,66 @@ public class TicTacToe {
          * re-enter the information
          */
         // validate playerName
-        if (playerName == null) {
-          playerName = prompt(input, "Enter username: ");
+        if (Human.getName() == null) 
+        {
+          String playerName = prompt(input, "Enter username: ");
+          NameValidation playerNameValidation = validatePlayerName(playerName);
+
+          // player name length is invalid
+          if (playerNameValidation == NameValidation.INVALID_LENGTH)
+            print("Invalid player name - too long");
+
+          // player character is invalid
+          if (playerNameValidation == NameValidation.INVALID_CHARACTERS)
+            print("Invalid player name - illegal characters");
+
+          // if player name validation fails, re-prompt the user
+          if (playerNameValidation != NameValidation.IS_VALID) 
+            continue;
+
+          // ! beyond this point, player name is valid
+          Human.setName(playerName);
         }
 
-        if (!isValidPlayerName(playerName)) {
-          playerName = null;
-          continue;
+        // validate chosen player character
+        if (Human.getCharacter() == null) 
+        {
+          String playerCharacter = prompt(input, "Choose your character (x or o): ");
+          CharacterValidation playerCharacterValidation = validateCharacter(playerCharacter);
+
+          // player character is invalid
+          if (playerCharacterValidation == CharacterValidation.INVALID_CHARACTER)
+            print("Invalid character entry - must be character 'o' or 'x'");
+          
+          // player character is the incorrect length
+          if (playerCharacterValidation == CharacterValidation.INVALID_LENGTH)
+            print("Invalid character length - must be one character");
+
+          // if player character is invalid, re-prompt user
+          if (playerCharacterValidation != CharacterValidation.IS_VALID) 
+              continue;
+
+          // ! beyond this point, player character is valid
+          Human.setCharacter(playerCharacter);
+          Computer.setCharacter(getInverseCharacter(playerCharacter));
         }
 
-        // valiate chosen player character
-        if (playerCharacter == null) {
-          playerCharacter = prompt(input, "Choose your character (x or o): ");
-          computerCharacter = getInverseCharacter(playerCharacter);
-        }
+        // decide who goes first
+        // if (firstPlayer == null) {
+        //   String goingFirst = prompt(input, "Who goes first? (1 = you, 2 = computer): ");
 
-        if (!isValidCharacter(playerCharacter)) {
-          print("Invalid character entry - must be the character 'o' or 'x'");
-          playerCharacter = null;
-          continue;
-        }
+        //   if (goingFirst.equalsIgnoreCase("1")) {
+        //     firstPlayer = Human;
+        //   } else if (goingFirst.equalsIgnoreCase("2")) {
+        //     firstPlayer = Computer;
+        //   } else {
+        //     continue;
+        //   }
+        // }
 
         // draw the initial game board
         initializeAvailableGameMoves();
-        draw__gameBoard(gameState);
+        draw__gameBoard(gameGrid);
 
         /*
          * TURN-BASED LOOP:
@@ -81,27 +186,75 @@ public class TicTacToe {
          * prompting the user for their next game move, and compare it against
          * the computer's simulated game move.
          */
-        while (true) {
+        while (true) 
+        {
           // handle input validation
           String userMove = prompt(input, "Enter your move (ex: a2): ");
-          int[] gridCoords = parseGridCoords(userMove);
+          MoveInputValidation moveInputValidation = validateMoveInput(userMove);
 
-          if (gridCoords == null) {
-            print("Invalid move - user input must be a 2-character string of row:column");
+          // validate move entry
+          if (moveInputValidation == MoveInputValidation.INVALID_LENGTH)
+            print("Invalid move input - must enter only 2 characters for row|column");
+
+          if (moveInputValidation != MoveInputValidation.IS_VALID)
             continue;
-          }
+
+          // ! beyond this point, move entry is valid
+          // TODO: find a way to generalize user and computer moves to easily reverse the order
+
+          /*
+           * USER MOVE
+           */
+          int[] gridCoords = parseGridCoords(userMove);
+          MoveValidation moveValidation = validateMove(gridCoords);
+
+          // check parsed move entry for valid coordinates
+          if (moveValidation == MoveValidation.OUT_OF_BOUNDS)
+            print("Invalid move - entry is out of grid bounds");
+
+          // validate parsed move entry for valid slot availability
+          if (moveValidation == MoveValidation.SLOT_TAKEN) 
+            print("Invalid move - slot has already been played");
+
+          // if grid coordinate are invalid, re-prompt the user
+          if (moveValidation != MoveValidation.IS_VALID)
+            continue;
 
           // if the game state could not be changed, then re-prompt the user 
-          if (!updateGameState(playerName, gridCoords, playerCharacter)) {
-            continue;
-          }
+          updateGameGrid(Human, gridCoords);
+          ArrayList<WinType> winningMoves = getWinningMoves(Human, gridCoords);
 
-          if (!simulateComputerMove()) {
-            print("Game over - computer cannot make any more moves");
+          // detect if user made a winning move
+          if (winningMoves.size() > 0) {
+            draw__gameBoard(gameGrid);
+            print("YOU WON!");
             System.exit(0);
           }
 
-          draw__gameBoard(gameState);
+          /*
+           * COMPUTER MOVE
+           */
+
+           // if the grid has no more available moves, then end the game with a tie
+          if (gameIsOver()) {
+            draw__gameBoard(gameGrid);
+            print("It was a TIE!");
+            System.exit(0);
+          }
+
+          // generate computer grid coordinates
+          gridCoords = getComputerMove();
+          updateGameGrid(Computer, gridCoords);
+          winningMoves = getWinningMoves(Computer, gridCoords);
+
+          // check computer win case
+          if (winningMoves.size() > 0) {
+            draw__gameBoard(gameGrid);
+            print("YOU LOST!");
+            System.exit(0);
+          }
+
+          draw__gameBoard(gameGrid);
         }
       }
 
@@ -138,47 +291,67 @@ public class TicTacToe {
   }
 
   /*
-   * INPUT VALIDATION METHODS
+   * isValidCharacter(<String> characterInput):
    */
-  public static boolean isValidCharacter(String characterInput) {
-    if (characterInput.length() > 1) return false;
+  public static CharacterValidation validateCharacter(String characterInput) 
+  {
+    if (characterInput.length() > 1) 
+      return CharacterValidation.INVALID_LENGTH;
+
     char chosenCharacter = Character.toLowerCase(characterInput.charAt(0));
 
-    if (!(chosenCharacter == 'o' || chosenCharacter == 'x')) return false;
+    if (!(chosenCharacter == 'o' || chosenCharacter == 'x')) 
+      return CharacterValidation.INVALID_CHARACTER;
 
-    return true;
+    return CharacterValidation.IS_VALID;
   }
 
-  public static boolean isValidMove(int[] gridCoords) {
+  /*
+   * validateMove(<int[]> gridCoords):
+   */
+  public static MoveValidation validateMove(int[] gridCoords) 
+  {
+    // check for out-of-bounds case
     if (
-      gridCoords[0] > gameState.length - 1 || gridCoords[0] < 0 || 
-      gridCoords[1] > gameState.length - 1 || gridCoords[1] < 0
+      gridCoords[0] > gameGrid.length - 1 || gridCoords[0] < 0 || 
+      gridCoords[1] > gameGrid.length - 1 || gridCoords[1] < 0
     ) {
-      print("Invalid move - choice is out of bounds");
-      return false;
+      return MoveValidation.OUT_OF_BOUNDS;
     }
 
+    if (gameIsOver()) 
+      return MoveValidation.GAME_OVER;
+
+    // check if the slot is vecant
     if (getGridElement(gridCoords) != null) {
-      print("Invalid move - slot is already taken");
-      return false;
+      return MoveValidation.SLOT_TAKEN;
     }
 
-    return true;
+    return MoveValidation.IS_VALID;
   }
 
-  public static boolean isValidPlayerName(String playerName) {
+  /*
+   * validatePlayerName(<String> playerName):
+   * 
+   * Returns whether or not the playerName the user entered
+   * follows the validation rules
+   */
+  public static NameValidation validatePlayerName(String playerName) 
+  {
     if (playerName.contains(" ")) {
-      print("Invalid player name - cannot contain spaces");
-      return false;
+      return NameValidation.INVALID_CHARACTERS;
     }
 
     if (playerName.length() > 25) {
-      print("Invalid player name - cannot exceed 25 characters");
-      return false;
+      return NameValidation.INVALID_LENGTH;
     }
 
-    return true;
+    return NameValidation.IS_VALID;
   } 
+
+  public static MoveInputValidation validateMoveInput(String moveInput) {
+    return moveInput.length() == 2 ? MoveInputValidation.IS_VALID : MoveInputValidation.INVALID_LENGTH;
+  }
 
   /*
    * prompt(<Scanner> input, <String> message):
@@ -200,7 +373,8 @@ public class TicTacToe {
    * Methods for displaying text in the output
    */
   // display the game intro text
-  public static void display__introMessage() {
+  public static void display__introMessage() 
+  {
     print("\n--------------------------------------------------------------------");
     print("---------------------- WELCOME TO TIC TAC TOE ----------------------");
     print("--------------------------------------------------------------------\n");
@@ -217,11 +391,8 @@ public class TicTacToe {
    * @param <String> userMove: the unparsed coordinate string of the user's move
    * @returns int[] gridCoordinates: the parsed row-column pair
    */
-  public static int[] parseGridCoords(String userMove) {
-    // find the row/col number
-    if (userMove.length() != 2)
-      return null;
-
+  public static int[] parseGridCoords(String userMove) 
+  {
     int row = Character.toLowerCase(userMove.charAt(0)) - 'a';
     int col = Character.getNumericValue(userMove.charAt(1)) - 1;
 
@@ -229,38 +400,83 @@ public class TicTacToe {
     return new int[] {row, col};
   }
 
+  /*
+   * getInverseCharacter(<String> character):
+   * 
+   * Get the opposite game piece to the character passed
+   * as the argument.
+   * 
+   * @param <String> character: the character the user entered
+   * @returns <String> oppositeCharacter: the character opposite to the one provided
+   */
   public static String getInverseCharacter(String character) {
     return character.equalsIgnoreCase("x") ? "o" : "x";
   }
 
+  /*
+   * getGridElement(<int[]> coords):
+   * 
+   * Return the game board element at the specified coordinates
+   * 
+   * @param <int[]> coords
+   * @returns <String> element: the entry at the grid coordinates
+   */
   public static String getGridElement(int[] coords) {
-    return gameState[coords[0]][coords[1]];
+    return gameGrid[coords[0]][coords[1]];
   }
 
+  /*
+   * gameIsActive():
+   * 
+   * returns true if there are still available grid rows
+   * to choose from
+   */
   public static boolean gameIsActive() {
     return availableRows.size() > 0;
   }
 
+    /*
+   * gameIsOver():
+   * 
+   * returns true if there are NO MORE available moves
+   * to make (when all grid rows are occupied)
+   */
   public static boolean gameIsOver() {
     return !gameIsActive();
   }
 
-  public static void initializeAvailableGameMoves() {
-    for (int rowNum = 0; rowNum < gameState.length; rowNum++) {
+  /*
+   * initializeAvailableGameMoves():
+   * 
+   * Initialize the available rows & columns ArrayLists. by default,
+   * the available lists are empty. They must be manually populated
+   * with all of the entries of the gameGrid array.
+   */
+  public static void initializeAvailableGameMoves() 
+  {
+    for (int rowNum = 0; rowNum < gameGrid.length; rowNum++) 
+    {
+      // add available row numbers
       availableRows.add(rowNum);
       ArrayList<Integer> cols = new ArrayList<>();
 
-      for (int colNum = 0; colNum < gameState.length; colNum++)
+      // add adailable column numbers to the row table
+      for (int colNum = 0; colNum < gameGrid.length; colNum++)
         cols.add(colNum);
 
       availableCols.put(rowNum, cols);
     }
   }
 
-  public static boolean simulateComputerMove() {
-    // check if there are still available moves
-    if (gameIsOver()) return false;
-
+  /*
+   * simulateComputerMove():
+   * 
+   * Simulate the computer making a move. Returns true if
+   * the computer was able to make a movie, or false if 
+   * the computer could not make a move. 
+   */
+  public static int[] getComputerMove() 
+  {
     // at this point, at least one row + col is remaining
     int randRow = availableRows.get((int) (Math.random()*availableRows.size()));
     ArrayList<Integer> row = availableCols.get(randRow);
@@ -270,43 +486,80 @@ public class TicTacToe {
 
     // construct the existing randomized grid coordinates
     int[] gridCoords = {randRow, randCol};
-
-    return updateGameState(computerName, gridCoords, computerCharacter);
+    return gridCoords;
   }
 
   /*
-   * updateGameState(<int[]> coords, <String> character):
+   * updateGameGrid(<int[]> coords, <String> character):
    * 
    * Update the game board at the given coordinates with
-   * a new state.
-   * 
-   * TODO: add validation for checking if the update is valid.
-   * the method should return `true` if the update passed, or
-   * `false` if the update failed.
+   * a new state. This method ASSUMES a move is already validated.
+   * Moves can be validated using `validateMove()`
    * 
    * @param <int[]> coords: the coordinate pair on the grid to update
    * @param <String> character: the player character to enter at the coordinates
    */
-  public static boolean updateGameState(String playerName, int[] coords, String character) {
+  public static boolean updateGameGrid(Player player, int[] coords) 
+  {
+    try {
+      // unpack the row:col coordinates
+      int rowNum = coords[0];
+      int colNum = coords[1];
+
+      // update the game state grid
+      String[] row = gameGrid[rowNum];
+      row[colNum] = player.getCharacter();
+
+      // update the available columns array
+      ArrayList<Integer> remainingCols = availableCols.get(rowNum);
+      remainingCols.remove(Integer.valueOf(colNum));
+
+      // if no more columns are available in the row, remove the row from available rows
+      if (remainingCols.isEmpty())
+        availableRows.remove(Integer.valueOf(rowNum));
+
+      return true;
+    } catch(Exception err) {
+      return false;
+    }
+  }
+
+  public static ArrayList<WinType> getWinningMoves(Player player, int[] coords) {
     // unpack the row:col coordinates
     int rowNum = coords[0];
     int colNum = coords[1];
 
-    // check for move validation
-    if (!isValidMove(coords)) return false;
-
     // update the game state grid
-    gameState[rowNum][colNum] = character;
+    String[] row = gameGrid[rowNum];
+    ArrayList<WinType> winningMoves = new ArrayList<>();
 
-    // update the available columns array
-    ArrayList<Integer> remainingCols = availableCols.get(rowNum);
-    remainingCols.remove(Integer.valueOf(colNum));
+    // check for winner
+    winningMoves.add(WinType.ROW);
+    winningMoves.add(WinType.COLUMN);
 
-    // if no more columns are available in the row, remove the row from available rows
-    if (remainingCols.isEmpty())
-      availableRows.remove(Integer.valueOf(rowNum));
+    // row check
+    for (String entry : row)
+      if (entry != player.getCharacter())
+        winningMoves.remove(WinType.ROW);
 
-    return true;
+    // column check
+    for (String[] gridRow : gameGrid)
+      if (gridRow[colNum] != player.getCharacter())
+        winningMoves.remove(WinType.COLUMN);
+
+    // diagonal check
+    if (rowNum == colNum) {
+      winningMoves.add(WinType.DIAGONAL);
+
+      for (int i = 0; i < gameGrid.length; i++) {
+        String[] gridRow = gameGrid[i];
+
+        if (gridRow[i] != player.getCharacter())
+          winningMoves.remove(WinType.DIAGONAL);
+      }
+    }
+
+    return winningMoves;
   }
 
   /*
@@ -319,8 +572,9 @@ public class TicTacToe {
    * @param <String[]> row: the row in the game state array
    * @returns: <String[]> formattedRow: an array with the formatted entries
    */
-  public static String[] formatRowEntries(String[] row) {
-    String[] formattedRow = new String[gameState.length];
+  public static String[] formatRowEntries(String[] row) 
+  {
+    String[] formattedRow = new String[gameGrid.length];
 
     // update all `null` entries with "_", or keep `entry` 
     for (int i = 0; i < row.length; i++) {
@@ -333,7 +587,7 @@ public class TicTacToe {
   }
   
   /*
-   * draw__gameBoard(<String[][]> gameState):
+   * draw__gameBoard(<String[][]> gameGrid):
    * 
    * Responsible for rendering the game board to the terminal
    * based on the current grid state of the game.
@@ -341,18 +595,20 @@ public class TicTacToe {
    * TODO: make the `printf` display support more than 3 rows
    * of tic tac toe
    */
-  public static void draw__gameBoard(String[][] gameState) {
+  public static void draw__gameBoard(String[][] gameGrid) 
+  {
     // iterate over game state
     print("\n");
     write("\t");
 
-    for (int i = 0; i < gameState.length; i++) 
+    for (int i = 0; i < gameGrid.length; i++) 
       write(((i > 0) ? " ".repeat(5) : " ") + (i + 1));
 
     print("\n");
 
-    for (int i = 0; i < gameState.length; i++) {
-      String[] row = formatRowEntries(gameState[i]);
+    for (int i = 0; i < gameGrid.length; i++) 
+    {
+      String[] row = formatRowEntries(gameGrid[i]);
 
       // format and display the row
       printf(
@@ -364,7 +620,7 @@ public class TicTacToe {
       );
 
       // separate rows in between data points
-      if (i < gameState.length - 1) print("\t---------------");
+      if (i < gameGrid.length - 1) print("\t---------------");
     }
 
     print("\n");

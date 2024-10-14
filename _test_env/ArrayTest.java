@@ -1,13 +1,13 @@
 
+import java.util.*;
 
-public class ArrayTest {
+class ArrayTest {
+  class Player {
+      public String name = "lol";
+  }
   public static void main(String[] args) {
-    String[][] arr = {
-      {null, null, null},
-      {null, null, null},
-      {null, null, null},
-    };
-
-    System.out.println(arr[0].length);
+      
+      Player thing = new Player();
+      System.out.println(thing);
   }
 }
