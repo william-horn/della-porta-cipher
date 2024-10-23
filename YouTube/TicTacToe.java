@@ -201,6 +201,7 @@ public class TicTacToe {
 
           // ! beyond this point, move entry is valid
           // TODO: find a way to generalize user and computer moves to easily reverse the order
+          // of who goes first
 
           /*
            * USER MOVE
@@ -225,7 +226,7 @@ public class TicTacToe {
           ArrayList<WinType> winningMoves = getWinningMoves(Human, gridCoords);
 
           // detect if user made a winning move
-          if (winningMoves.size() > 0) {
+          if (!winningMoves.isEmpty()) {
             draw__gameBoard(gameGrid);
             print("YOU WON!");
             System.exit(0);
@@ -248,7 +249,7 @@ public class TicTacToe {
           winningMoves = getWinningMoves(Computer, gridCoords);
 
           // check computer win case
-          if (winningMoves.size() > 0) {
+          if (!winningMoves.isEmpty()) {
             draw__gameBoard(gameGrid);
             print("YOU LOST!");
             System.exit(0);
@@ -432,7 +433,7 @@ public class TicTacToe {
    * to choose from
    */
   public static boolean gameIsActive() {
-    return availableRows.size() > 0;
+    return !availableRows.isEmpty();
   }
 
     /*
@@ -507,8 +508,7 @@ public class TicTacToe {
       int colNum = coords[1];
 
       // update the game state grid
-      String[] row = gameGrid[rowNum];
-      row[colNum] = player.getCharacter();
+      gameGrid[rowNum][colNum] = player.getCharacter();
 
       // update the available columns array
       ArrayList<Integer> remainingCols = availableCols.get(rowNum);
@@ -539,12 +539,12 @@ public class TicTacToe {
 
     // row check
     for (String entry : row)
-      if (entry != player.getCharacter())
+      if (!player.getCharacter().equals(entry))
         winningMoves.remove(WinType.ROW);
 
     // column check
     for (String[] gridRow : gameGrid)
-      if (gridRow[colNum] != player.getCharacter())
+      if (!player.getCharacter().equals(gridRow[colNum]))
         winningMoves.remove(WinType.COLUMN);
 
     // diagonal check
@@ -554,7 +554,7 @@ public class TicTacToe {
       for (int i = 0; i < gameGrid.length; i++) {
         String[] gridRow = gameGrid[i];
 
-        if (gridRow[i] != player.getCharacter())
+        if (!player.getCharacter().equals(gridRow[i]))
           winningMoves.remove(WinType.DIAGONAL);
       }
     }
