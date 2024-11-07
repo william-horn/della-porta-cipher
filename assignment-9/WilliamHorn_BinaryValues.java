@@ -122,7 +122,7 @@ public class WilliamHorn_BinaryValues {
           System.out.println("Binary value cannot exceed size boundary");
           System.exit(0);
         }
-        
+
         // convert the 2s comp binary to decimal
         decValue1 = twosCompToDec(binaryValue1);
 
@@ -136,6 +136,10 @@ public class WilliamHorn_BinaryValues {
         if (binaryValue2.length() > wordSize) {
           System.out.println("Binary value cannot exceed size boundary");
           System.exit(0);
+        }
+
+        for (int x = 0; x < 100; x++) {
+          System.out.print("For next");
         }
 
         // convert the 2s comp binary to decimal
