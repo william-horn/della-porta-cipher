@@ -55,7 +55,7 @@ public class WilliamHorn_7_26 {
   public static int[] promptList(Scanner input, String message) {
     System.out.print(message);
     String list_1 = input.next();
-
+    
     // Use the first integer in the list to set the array size
     int list_size = Integer.parseInt(list_1);
     int[] list = new int[list_size];
