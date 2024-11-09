@@ -66,7 +66,7 @@ public class DellaPortaCipher {
    *    {'h', 'b'}, 
    *    {'e', 'o'}, 
    *    {'l', 'x'}, 
-   *    {'l', b'}, 
+   *    {'l', 'b'}, 
    *    {'o', 'o'}
    *  }
    * 
