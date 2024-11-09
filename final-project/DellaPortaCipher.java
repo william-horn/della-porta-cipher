@@ -63,7 +63,11 @@ public class DellaPortaCipher {
    *  Keyword = "box"
    * 
    *  Output -> {
-   *    {'h', 'b'}, {'e', 'o'}, {'l', 'x'}, {'l', b'}, {'o', 'o'}
+   *    {'h', 'b'}, 
+   *    {'e', 'o'}, 
+   *    {'l', 'x'}, 
+   *    {'l', b'}, 
+   *    {'o', 'o'}
    *  }
    * 
    * Note: The first array entry of each row is the phrase letter, while the
