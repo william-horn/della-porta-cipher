@@ -157,7 +157,7 @@ public class DellaPortaCipher {
     int bytecode = character;
     int letterIndex = (bytecode - 97);
 
-    return (int) (Math.ceil(letterIndex/2));
+    return letterIndex/2;
   }
 
   /*
