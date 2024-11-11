@@ -96,8 +96,8 @@ public class DellaPortaCipher {
      * character in the phrase.
      * 
      * `keywordCounter` is manually incremented, because we don't want to grab the next letter
-     * in the keyword if we encounter a space character in the phrase. A keyword letter should not
-     * map to a space character. Space characters are still added to the array, but are not included
+     * in the keyword if we encounter a non-alphabet character in the phrase. A keyword letter should not
+     * map to a non-alphabet character. Non-alphabet characters are still added to the array, but are not included
      * in the counting process.
      */
     for (int phraseIndex = 0, keywordCounter = 0; phraseIndex < phraseLength; phraseIndex++) 
