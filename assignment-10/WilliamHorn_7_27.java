@@ -64,24 +64,16 @@
     // new 2D array structure
     int[][] elementFrequencyChart = new int[list.length][2];
 
-    /*
-     * Note: Hashmaps or dictionary structures would work better here,
-     * but to stay within bounds of the assignment, this manipulation of
-     * 2D arrays emulates what you would do with a hashmap
-     */
-    for (int i = 0; i < list.length; i++) {
-      int listElement = list[i];
-      int[] chartElement = getFrequencyChartElement(elementFrequencyChart, listElement);
+    for (int i = 0; i < list.length; i++) 
+    {
+      int value = list[i];
+      int[] elementRecord = getFrequencyChartElement(elementFrequencyChart, value);
 
-      // if the element is a repeat, increase it's frequency variable in the chart
-      if (chartElement != null) {
-        chartElement[1]++;
-        elementFrequencyChart[i] = null;
-        continue;
+      if (elementRecord == null) {
+        elementFrequencyChart[i] = new int[] {value, 1};
+      } else {
+        elementRecord[1]++;
       }
-
-      // otherwise, instantiate the element frequency in the chart
-      elementFrequencyChart[i] = new int[] {listElement, 1};
     }
 
     return elementFrequencyChart;
@@ -100,10 +92,8 @@
    * @return <int[][] | null> chartElement: The row of the frequency chart to return. If none exists, returns null.
    */
   public static int[] getFrequencyChartElement(int[][] chart, int element) {
-    for (int[] row : chart) {
-      if (row == null) continue;
-      if (row[0] == element) return row;
-    }
+    for (int[] row : chart)
+      if ((row != null) && (row[0] == element)) return row;
 
     return null;
   }
@@ -119,6 +109,10 @@
   */
   public static boolean equals(int[] list1, int[] list2) {
     int[][] list1FrequencyChart = createElementFrequencyChart(list1);
+
+    // for (int[] g : list1FrequencyChart) {
+    //   System.out.println("list 1 FC: " + g[0] + ", " + g[1]);
+    // }
 
     for (int i = 0; i < list2.length; i++) {
       int list2Element = list2[i];
