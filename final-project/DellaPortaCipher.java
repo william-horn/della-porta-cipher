@@ -210,10 +210,8 @@ public class DellaPortaCipher {
     // the final encrypted/decrypted result
     String text = "";
 
-    for (int i = 0; i < keywordPhrasePairs.length; i++) 
+    for (char[] row : keywordPhrasePairs) 
     {
-      char[] row = keywordPhrasePairs[i];
-
       // extract the mapped phrase and keyword letters from each row
       char phraseLetter = row[0];
       char keywordLetter = row[1];
@@ -253,8 +251,10 @@ public class DellaPortaCipher {
     try (Scanner input = new Scanner(System.in)) 
     {
       // user input parameters
+      println("\n------- DELLA PORTA CIPHER ---------------------------\n");
       String phrase = promptMessage(input, "Enter phrase: ");
       String keyword = promptMessage(input, "Enter keyword: ");
+      println("\n------------------------------------------------------\n");
 
       // input validation
       if (!containsExclusivelyLetters(keyword)) {
@@ -262,7 +262,7 @@ public class DellaPortaCipher {
         System.exit(0);
       }
 
-      println(convertPortaCipher(phrase, keyword));
+      println("Result: " + convertPortaCipher(phrase, keyword) + "\n");
     }
   }
 }
