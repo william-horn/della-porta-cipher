@@ -183,14 +183,15 @@ public class DellaPortaCipher {
     // get the row index of the keyword letter
     int portaRowIndex = getPortaRowIndexOf(keywordLetter);
 
-    char letter = phraseLetter < 'n' ?
-      // phrase letter is before 'n':
-      (char) (('a' + PORTA_MATRIX_SIZE) + ((phraseLetter - 'a') + portaRowIndex)%PORTA_MATRIX_SIZE):
+    char encryptedLetter;
 
-      // phrase letter is including or after n:
-      (char) ('a' + (PORTA_MATRIX_SIZE - (('z' - phraseLetter) + portaRowIndex)%PORTA_MATRIX_SIZE) - 1);
+    // calculate the compliment character of phraseLetter
+    if (phraseLetter < 'n')
+      encryptedLetter = (char) (('a' + PORTA_MATRIX_SIZE) + ((phraseLetter - 'a') + portaRowIndex)%PORTA_MATRIX_SIZE);
+    else
+      encryptedLetter = (char) ('a' + (PORTA_MATRIX_SIZE - (('z' - phraseLetter) + portaRowIndex)%PORTA_MATRIX_SIZE) - 1);
 
-    return letter;
+    return encryptedLetter;
   }
 
   /*
