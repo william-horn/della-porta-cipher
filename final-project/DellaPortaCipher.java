@@ -312,8 +312,6 @@ public class DellaPortaCipher {
     }
   }
 
-
-
   /*
    * getKeywordPhrasePairs(<String> keyword, <String> phrase):
    * 
