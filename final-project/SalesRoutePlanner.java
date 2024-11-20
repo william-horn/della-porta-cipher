@@ -18,6 +18,45 @@ public class SalesRoutePlanner {
     {51}
   };
 
+  final public static String[] LOCATION_NAMES = {
+    "Allendale", "Charleston", "Columbia",
+    "Conway", "Florence", "Lancaster",
+    "Manning", "McCormick", "Pickens",
+    "Spartanburg"
+  };
+
+  // public static enum Locations {
+  //   ALLENDALE, CHARLESTON, COLUMBIA,
+  //   CONWAY, FLORENCE, LANCASTER,
+  //   MANNING, MCCORMICK, PICKENS,
+  //   SPARTANBURG
+  // }
+
+  public static int getIndexOf(String[] list, String element) 
+  {
+    for (int i = 0; i < list.length; i++) 
+      if (list[i].equals(element)) return i;
+
+    return -1;
+  }
+
+  /*
+   * getDistanceFrom(<String> from, <String> to):
+   * 
+   * Compute the distance from location A to location B based on the
+   * provided Distance chart. Computation uses only half of the distance mappings.
+   * 
+   * @param <String> from: The origin location
+   * @param <String> to: The destination location
+   * @return <int> Distance: The distance between 'from' and 'to'
+   */
+  public static int getDistanceFrom(String from, String to) 
+  {
+    if (from.equals(to)) return 0;
+
+    
+  }
+
   /*
    * println(<Object> message):
    * 
@@ -63,6 +102,6 @@ public class SalesRoutePlanner {
   }
 
   public static void main(String[] args) {
-    
+    // TODO: add logic for user input 
   }
 }
