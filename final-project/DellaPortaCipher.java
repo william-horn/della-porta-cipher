@@ -1,12 +1,30 @@
 /*
- * Will Horn
- * 11/9/2024
+ * Will, Jaylen, Alex 
  */
 
-import java.util.*;
+ import java.io.BufferedWriter;
+ import java.io.File;
+ import java.io.FileWriter;
+ import java.io.IOException;
+ import java.util.Scanner;
+ import java.util.ArrayList;
 
 public class DellaPortaCipher {
+  /*
+   * -------------------
+   * | Program Config: |
+   * -------------------
+   */
+
+  // Constants
   final public static int PORTA_MATRIX_SIZE = 13;
+
+  final public static String OUTPUT_PATH = "/output.txt";
+  final public static String PROGRAM_LOG_PATH = "/programlog.txt";
+
+  // States & Variables
+  public static boolean inDebugMode = false;
+  public static ArrayList<String> programLogs = new ArrayList<>();
 
   /*
    * println(<Object> message):
@@ -27,17 +45,12 @@ public class DellaPortaCipher {
   }
 
   /*
-   * promptMessage(<Scanner> input, <String> message):
+   * printf(<String> template, <Object> ...args):
    * 
-   * A combination of printing and inline message with
-   * prompting 
-   * 
-   * @param <Scanner> input: The scanner object to prompt the user input
-   * @param <String> message: The message to display before requesting the input
+   * Shorthand for: System.out.printf(...);
    */
-  public static String promptMessage(Scanner input, String message) {
-    print(message);
-    return input.nextLine();
+  public static void printf(String template, Object ...args) {
+    System.out.printf(template, args);
   }
 
   /*
@@ -49,8 +62,257 @@ public class DellaPortaCipher {
    * @return void
    */
   public static void error(String message) {
-    println("\nError: " + message);
+    println("[ ! ] ERROR: " + message);
   }
+
+  // conditional println() when debug mode is enabled
+  public static void debugPrintln(Object message) {
+    if (inDebugMode) println("[ ? ] " + message);
+  }
+
+  // conditional print() when debug mode is enabled
+  public static void debugPrint(Object message) {
+    if (inDebugMode) print("\n[ ? ] " + message);
+  }
+
+  // conditional printf() when debug mode is enabled
+  public static void debugPrintf(String template, Object ...args) {
+    if (inDebugMode) {
+      println("");
+      printf("[ ? ] " + template, args);
+    }
+  }
+
+  // conditional error() when debug mode is enabled
+  public static void debugError(String message) {
+    if (inDebugMode) error(message);
+  }
+
+  /*
+   * promptMessage(<Scanner> input, <String> message):
+   * 
+   * A combination of printing and inline message with
+   * prompting 
+   * 
+   * @param <Scanner> input: The scanner object to prompt the user input
+   * @param <String> message: The message to display before requesting the input
+   */
+  public static String promptMessage(Scanner input, String message) {
+    print("> " + message);
+    return input.nextLine();
+  }
+
+  /*
+   * promptMenu(<Scanner> input, <String> title, <String> promptMessage, String[] choiceArray):
+   * 
+   * Prompt the user with a list of menu items to choose from.
+   * 
+   * @param <Scanner> input: The scanner object to prompt the user input
+   * @param <String> title: The title of the menu list
+   * @param <String> promptMessage: The message that comes before the input cursor
+   * @param <String[]> choiceArray: An array of string values to be displayed as menu items
+   * @return <int> The menu item (starting at 1)
+   */
+  public static int promptMenu(Scanner input, String title, String promptMessage, String[] choices)
+  {
+    // create padding in between | menuTitle |
+    int padding = title.length() + 4;
+    println("");
+
+    // display the menu title
+    println("-".repeat(padding));
+    printf("| %s |\n", title);
+    println("-".repeat(padding) + "\n");
+
+    // display the menu options
+    for (int i = 1; i <= choices.length; i++)
+      printf("%s) %s\n", i, choices[i - 1]);
+
+    // display the prompt message
+    print("\n> " + promptMessage);
+
+    // collect user input
+    int itemNumber = input.nextInt();
+    input.nextLine();
+
+    return itemNumber;
+  }
+
+  public static boolean promptBoolean(Scanner input, String message)
+  {
+    String submission = promptMessage(input, message + " (y/n): ");
+    return submission.toLowerCase().equals("y");
+  }
+
+  /*
+   * getPath(<String> path):
+   * 
+   * Get the absolute path based on the PATH_NAME constant defined in the class.
+   * 
+   * @param path: the relative path to the java file being executed
+   * @returns: <String> absolutePath
+   */
+  public static String getPath(String path) {
+    String dir = System.getProperty("user.dir"); 
+    return dir + path;
+  }
+
+  public static void addLog(String message) {
+    programLogs.add(message);
+  }
+
+  public static void updateLogs(File programLogFile, boolean append) 
+  {
+    if (!getDebugMode()) return;
+
+    String text = "";
+
+    for (String log : programLogs)
+      text += log + "\n";
+
+    writeFile(programLogFile, text, append);
+    clearLogs();
+  }
+
+  public static void addErrorLog(String message) {
+    addLog("ERROR: " + message);
+  }
+
+  public static void addWarningLog(String message) {
+    addLog("WARNING: " + message);
+  }
+
+  public static void clearLogs() {
+    programLogs.clear();
+  }
+
+  public static ArrayList<String> getLogs() {
+    return programLogs;
+  }
+
+  public static void setDebugMode(boolean enabled) {
+    inDebugMode = enabled;
+  }
+
+  public static boolean getDebugMode() {
+    return inDebugMode;
+  }
+
+  /*
+   * getFileSource(<File> file):
+   * 
+   * Compile all text source lines in the file into one string
+   * 
+   * @param file: The file object to read and convert to a string
+   * @returns: <String> fileSource
+   */
+  // public static String getFileSource(File file) 
+  // {
+  //   String source = "";
+
+  //   try (Scanner reader = new Scanner(file)) 
+  //   {
+  //     while (reader.hasNextLine()) 
+  //       source += reader.nextLine() + "\n";
+
+  //     return source;
+
+  //   } catch (IOException e) 
+  //   {
+  //     debugError(e.getMessage());
+  //     return "READ_ERROR";
+  //   }
+  // }
+
+  /*
+   * establishFile(<File> file, <boolean> required):
+   * 
+   * Create a file with the given path in the `file` argument, unless it
+   * already exists. If the second argument `required` is true, then the
+   * program will exit if the file does not exist. Regardless, if a file
+   * does not exist but is used in the program, the program will create
+   * the file.
+   * 
+   * @param file: The file path to establish
+   * @param required: whether or not the file is required for the program to run
+   * @returns: <boolean> newFileWasCreated
+   */
+  public static boolean establishFile(File file, boolean required) 
+  {
+    String log = "";
+
+    try 
+    {
+      // check if the file is required and the file doesn't exist
+      // if true: create the file and exit
+      // if false: continue
+      if (required && !file.exists()) 
+      {
+        log = "Required file '%s' does not exist (creating blank txt file)";
+
+        debugPrintf(log + "\n", file.getName());
+        addLog(log.replaceAll("%s", file.getName()));
+
+        file.createNewFile();
+        System.exit(0);
+      }
+
+      // create the file or do nothing if it already exists
+      boolean fileCreated = file.createNewFile();
+
+      // if the file was created, then announce new file name
+      if (fileCreated) 
+      {
+        log = "New file created: %s";
+
+        debugPrintf(log + "\n", file.getName());
+        addLog(log.replaceAll("%s", file.getName()));
+
+        return true;
+      }
+
+      // if file was not created, announce that it already exists
+      log = "File '%s' already exists";
+
+      debugPrintf(log + "\n", file.getName());
+      addLog(log.replaceAll("%s", file.getName()));
+
+      return false;
+
+    } catch(IOException e) 
+    {
+      debugError(e.getMessage());
+      addErrorLog("Issue establishing file: " + e.getMessage());
+
+      return false;
+    }
+  }
+
+  public static void writeFile(File file, String text, boolean append) 
+  {
+    // write the new modified input source to the output file
+    try 
+    {
+      // create the file writer & buffered writer to write to the output file
+      FileWriter fw = new FileWriter(file.getAbsoluteFile(), append);
+
+      // create BufferWriter try-with-resources block to auto-close connection
+      try (BufferedWriter bw = new BufferedWriter(fw)) {
+        // write to the output file and close the connection
+        bw.write(text);
+        // bw.flush();
+
+      } catch (IOException e) {
+        addErrorLog("Issue writing to file: " + e.getMessage());
+        debugError(e.getMessage());
+      }
+    } catch (IOException e) {
+      addErrorLog("Issue creating FileWriter: " + e.getMessage());
+      debugError(e.getMessage());
+    }
+  }
+
+
 
   /*
    * getKeywordPhrasePairs(<String> keyword, <String> phrase):
@@ -79,6 +341,8 @@ public class DellaPortaCipher {
    */
   public static char[][] getKeywordPhrasePairs(String phrase, String keyword) 
   {
+    addLog("Mapping keyword letters to phrase letters...\n");
+
     // convert keyword and phrase to lowercase to make bytecode-checking easier
     keyword = keyword.toLowerCase();
     phrase = phrase.toLowerCase();
@@ -129,6 +393,8 @@ public class DellaPortaCipher {
         phraseLetter,
         keywordLetter
       };
+
+      addLog("{ " + phraseLetter + ", " + keywordLetter + " }");
     }
 
     return keywordPhrasePairs;
@@ -205,11 +471,15 @@ public class DellaPortaCipher {
    */
   public static String convertPortaCipher(String phrase, String keyword) 
   {
+    addLog("Preparing to convert phrase...");
+
     // create the keyword/phrase letter pairs
     char[][] keywordPhrasePairs = getKeywordPhrasePairs(phrase, keyword);
 
     // the final encrypted/decrypted result
     String text = "";
+
+    addLog("\nPreparing to iterate over keywordPhrasePairs to find letter compliments...\n");
 
     for (char[] row : keywordPhrasePairs) 
     {
@@ -220,8 +490,11 @@ public class DellaPortaCipher {
       // get the compliment of a given phrase character based on it's corresponding keyword character
       char encryptedLetter = getPortaCompliment(phraseLetter, keywordLetter);
       text += encryptedLetter;
+
+      addLog(phraseLetter + " -> " + encryptedLetter);
     }
 
+    addLog("");
     return text;
   }
 
@@ -237,11 +510,19 @@ public class DellaPortaCipher {
   public static boolean containsExclusivelyLetters(String text) 
   {
     // if the string is blank, invalidate the string
-    if (text.trim().equals("")) return false;
+    if (text.trim().equals("")) {
+      addErrorLog("Text is empty: ''");
+      return false;
+    }
 
     // if the string contains non-alphabet characters, invalidate the string
-    for (int i = 0; i < text.length(); i++) 
-      if (!Character.isLetter(text.charAt(i))) return false;
+    for (int i = 0; i < text.length(); i++) {
+      char letter = text.charAt(i);
+      if (!Character.isLetter(letter)) {
+        addErrorLog("Found non-alphabet character in text: '" + letter + "'");
+        return false;
+      }
+    }
 
     // if all else, validate the string
     return true;
@@ -249,21 +530,87 @@ public class DellaPortaCipher {
  
   public static void main(String[] args) 
   {
+    File outputFile = new File(getPath(OUTPUT_PATH));
+    File programLogFile = new File(getPath(PROGRAM_LOG_PATH));
+
     try (Scanner input = new Scanner(System.in)) 
     {
-      // user input parameters
-      println("\n------- DELLA PORTA CIPHER ---------------------------\n");
-      String phrase = promptMessage(input, "Enter phrase: ");
-      String keyword = promptMessage(input, "Enter keyword: ");
-      println("\n------------------------------------------------------\n");
+      main: while (true) 
+      {
+        /*
+         * FILE WRITING:
+         * 
+         * Create an output file that contains progress logs as the program ran or
+         * is running. An output file will only be updated or generated if the
+         * algorithm is running in debug mode
+         */
+        setDebugMode(false);
+        clearLogs();
+        writeFile(programLogFile, "START\n", false);
 
-      // input validation
-      if (!containsExclusivelyLetters(keyword)) {
-        error("Keyword must be a single word containing only alphabet characters");
-        System.exit(0);
+        // user input parameters
+        println("\n======= DELLA PORTA CIPHER ===========================\n");
+        addLog("Waiting for user input...");
+        updateLogs(programLogFile, true);
+        setDebugMode(promptBoolean(input, "Run in debug mode"));
+
+        addLog("Set debug mode to: " + getDebugMode());
+        updateLogs(programLogFile, true);
+
+        println("");
+
+        String phrase = promptMessage(input, "Enter phrase: ");
+        addLog("Set phrase to: \"" + phrase + "\"");
+        updateLogs(programLogFile, true);
+
+        String keyword = promptMessage(input, "Enter keyword: ");
+        addLog("Set keyword to: \"" + keyword + "\"");
+
+        establishFile(outputFile, false);
+        establishFile(programLogFile, false);
+
+        updateLogs(programLogFile, true);
+
+        println("\n======================================================\n");
+
+        // input validation
+        if (!containsExclusivelyLetters(keyword)) {
+          addErrorLog("Invalid keyword");
+          updateLogs(programLogFile, true);
+          error("Keyword must be a single word containing only alphabet characters");
+          System.exit(0);
+        }
+
+        // generate the output text
+        String output = convertPortaCipher(phrase, keyword).toUpperCase();
+        println("=> Output: " + output);
+
+        // write to output file
+        writeFile(outputFile, output, false);
+
+        // end of the main program logic
+        addLog("END");
+        addLog("Waiting on user selection...");
+        updateLogs(programLogFile, true);
+
+        // prompt the user with some end-of-run options
+        int menuItem = promptMenu(
+          input, 
+          "Options:",
+          "Choose item number: ",
+          new String[] {
+            "Run Again",
+            "Exit"
+          }
+        );
+
+        // if the user choose to exit the program
+        switch (menuItem) {
+          case 2:
+            println("\nGoodbye!");
+            break main;
+        }
       }
-
-      println("Result: " + convertPortaCipher(phrase, keyword) + "\n");
     }
   }
 }
