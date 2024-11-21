@@ -395,13 +395,13 @@ public class DellaPortaCipher {
   }
 
   /*
-   * getKeywordPhrasePairs(<String> keyword, <String> phrase):
+   * getKeywordMessagePairs(<String> keyword, <String> message):
    * 
-   * Creates a 2D character array, mapping each letter in the given phrase
+   * Creates a 2D character array, mapping each letter in the given message
    * to the next character in the keyword sequence.
    * 
    * Ex: 
-   *  Phrase = "hello"
+   *  message = "hello"
    *  Keyword = "box"
    * 
    *  Output -> {
@@ -412,18 +412,20 @@ public class DellaPortaCipher {
    *    {'o', 'o'}
    *  }
    * 
-   * Note: The first array entry of each row is the phrase letter, while the
+   * Note: The first array entry of each row is the message letter, while the
    * second entry is the keyword letter.
    * 
-   * @param <String> keyword: The keyword to maps to the phrase letters
-   * @param <String> phrase: The phrase that maps to the keyword letters
-   * @return <char[][]> keywordPhrasePairs: The 2D array containing each pair of keyword letters mapping to phrase letters
+   * @param <String> keyword: The keyword to maps to the message letters
+   * @param <String> message: The message that maps to the keyword letters
+   * @return <char[][]> getKeywordMessagePairs: The 2D array containing each pair of keyword letters mapping to message letters
    */
-  public static char[][] getKeywordPhrasePairs(String message, String keyword){
+  public static char[][] getKeywordMessagePairs(String message, String keyword){
     // Initializes the keyword string, where the keyword will be copied into it until the string length is equal to that of the message string
     String keywordString = "";
 
     char[][] keywordPairs = new char[message.length()][2];
+
+    programLogs.add("Preparing to create keyword/message pairs array...\n");
 
     keyword = keyword.toLowerCase();
     message = message.toLowerCase();
@@ -462,6 +464,8 @@ public class DellaPortaCipher {
       keywordPairs[i][0] = message.charAt(i);
       // Copies each letter of the keyword string string along the second column
       keywordPairs[i][1] = keywordString.charAt(i);
+
+      programLogs.add("{ " + keywordPairs[i][0] + ", " + keywordPairs[i][1] + " }");
     }
 
     return keywordPairs;
@@ -494,21 +498,21 @@ public class DellaPortaCipher {
   }
 
   /*
-   * getPortaCompliment(<char> keywordLetter, <char> phraseLetter):
+   * getPortaCompliment(<char> keywordLetter, <char> messageLetter):
    * 
    * Calculate the porta compliment of a given letter. That is, given a
-   * phrase letter and a keyword letter, find the letter that corresponds
-   * with the phrase letter on the porta chart.
+   * message letter and a keyword letter, find the letter that corresponds
+   * with the message letter on the porta chart.
    * 
    * Ex:
    *  getPortaCompliment('n', 'e') -> 'x'
    *  getPortaCompliment('a', 'z') -> 'm'
    * 
    * @param <char> keywordLetter: The keyword letter, representing which row on the porta chart to index
-   * @param <char> phraseLetter: The phrase letter, representing the column on the porta chart
-   * @return <char> letter: The compliment of the phrase letter
+   * @param <char> messageLetter: The message letter, representing the column on the porta chart
+   * @return <char> letter: The compliment of the message letter
    */
-  public static char getPortaCompliment(char phraseLetter, char keywordLetter) 
+  public static char getPortaCompliment(char messageLetter, char keywordLetter) 
   {
     // if the keyword is non-alphabetic, then just return the character
     if (!Character.isLetter(keywordLetter)) return keywordLetter;
@@ -518,47 +522,47 @@ public class DellaPortaCipher {
 
     char encryptedLetter;
 
-    // calculate the compliment character of phraseLetter
-    if (phraseLetter < 'n')
-      encryptedLetter = (char) (('a' + PORTA_MATRIX_SIZE) + ((phraseLetter - 'a') + portaRowIndex)%PORTA_MATRIX_SIZE);
+    // calculate the compliment character of messageLetter
+    if (messageLetter < 'n')
+      encryptedLetter = (char) (('a' + PORTA_MATRIX_SIZE) + ((messageLetter - 'a') + portaRowIndex)%PORTA_MATRIX_SIZE);
     else
-      encryptedLetter = (char) ('a' + (PORTA_MATRIX_SIZE - (('z' - phraseLetter) + portaRowIndex)%PORTA_MATRIX_SIZE) - 1);
+      encryptedLetter = (char) ('a' + (PORTA_MATRIX_SIZE - (('z' - messageLetter) + portaRowIndex)%PORTA_MATRIX_SIZE) - 1);
 
     return encryptedLetter;
   }
 
   /*
-   * convertPortaCipher(<String> phrase, <String> keyword):
+   * convertPortaCipher(<String> message, <String> keyword):
    * 
-   * Encrypt or decrypt a given phrase string using the porta cipher encryption rules. 
+   * Encrypt or decrypt a given message string using the porta cipher encryption rules. 
    * 
-   * @param <String> phrase: The string to encrypt or decrypt
+   * @param <String> message: The string to encrypt or decrypt
    * @param <String> keyword: The keyword that determines the encryption or decryption
-   * @return <String> text: The encrypted or decrypted phrase string
+   * @return <String> text: The encrypted or decrypted message string
    */
-  public static String convertPortaCipher(String phrase, String keyword) 
+  public static String convertPortaCipher(String message, String keyword) 
   {
-    programLogs.add("Preparing to convert phrase...");
+    programLogs.add("Preparing to convert message...");
 
-    // create the keyword/phrase letter pairs
-    char[][] keywordPhrasePairs = getKeywordPhrasePairs(phrase, keyword);
+    // create the keyword/message letter pairs
+    char[][] keywordMessagePairs = getKeywordMessagePairs(message, keyword);
 
     // the final encrypted/decrypted result
     String text = "";
 
-    programLogs.add("\nPreparing to iterate over keywordPhrasePairs to find letter compliments...\n");
+    programLogs.add("\nPreparing to iterate over keywordMessagePairs to find letter compliments...\n");
 
-    for (char[] row : keywordPhrasePairs) 
+    for (char[] row : keywordMessagePairs) 
     {
-      // extract the mapped phrase and keyword letters from each row
-      char phraseLetter = row[0];
+      // extract the mapped message and keyword letters from each row
+      char messageLetter = row[0];
       char keywordLetter = row[1];
 
-      // get the compliment of a given phrase character based on it's corresponding keyword character
-      char encryptedLetter = getPortaCompliment(phraseLetter, keywordLetter);
+      // get the compliment of a given message character based on it's corresponding keyword character
+      char encryptedLetter = getPortaCompliment(messageLetter, keywordLetter);
       text += encryptedLetter;
 
-      programLogs.add(phraseLetter + " -> " + encryptedLetter);
+      programLogs.add(messageLetter + " -> " + encryptedLetter);
     }
 
     programLogs.add("");
@@ -635,8 +639,8 @@ public class DellaPortaCipher {
 
         println("");
 
-        String phrase = promptMessage(input, "Enter phrase: ");
-        programLogs.add("Set phrase to: \"" + phrase + "\"");
+        String message = promptMessage(input, "Enter message: ");
+        programLogs.add("Set message to: \"" + message + "\"");
         updateLogs(programLogFile, true);
 
         String keyword = promptMessage(input, "Enter keyword: ");
@@ -655,7 +659,7 @@ public class DellaPortaCipher {
         }
 
         // generate the output text
-        String output = convertPortaCipher(phrase, keyword).toUpperCase();
+        String output = convertPortaCipher(message, keyword).toUpperCase();
         println("=> Output: " + output);
 
         // write to output file
