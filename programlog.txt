@@ -3,46 +3,23 @@ File 'output.txt' already exists
 File 'programlog.txt' already exists
 Waiting for user input...
 Set debug mode to: true
-Set phrase to: "testing the text"
-Set keyword to: "world"
+Set phrase to: "lol testing"
+Set keyword to: "ok"
 Preparing to convert phrase...
-Mapping keyword letters to phrase letters...
-
-{ t, w }
-{ e, o }
-{ s, r }
-{ t, l }
-{ i, d }
-{ n, w }
-{ g, o }
-{  ,   }
-{ t, r }
-{ h, l }
-{ e, d }
-{  ,   }
-{ t, w }
-{ e, o }
-{ x, r }
-{ t, l }
 
 Preparing to iterate over keywordPhrasePairs to find letter compliments...
 
-t -> i
-e -> y
-s -> k
-t -> b
-i -> w
-n -> c
-g -> n
+l -> s
+o -> j
+l -> s
   ->  
-t -> l
-h -> z
-e -> s
-  ->  
-t -> i
-e -> y
-x -> c
 t -> b
+e -> y
+s -> a
+t -> m
+i -> n
+n -> g
+g -> y
 
 END
 Waiting on user selection...

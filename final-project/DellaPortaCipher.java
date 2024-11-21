@@ -419,65 +419,52 @@ public class DellaPortaCipher {
    * @param <String> phrase: The phrase that maps to the keyword letters
    * @return <char[][]> keywordPhrasePairs: The 2D array containing each pair of keyword letters mapping to phrase letters
    */
-  public static char[][] getKeywordPhrasePairs(String phrase, String keyword) 
-  {
-    programLogs.add("Mapping keyword letters to phrase letters...\n");
+  public static char[][] getKeywordPhrasePairs(String message, String keyword){
+    // Initializes the keyword string, where the keyword will be copied into it until the string length is equal to that of the message string
+    String keywordString = "";
 
-    // convert keyword and phrase to lowercase to make bytecode-checking easier
+    char[][] keywordPairs = new char[message.length()][2];
+
     keyword = keyword.toLowerCase();
-    phrase = phrase.toLowerCase();
+    message = message.toLowerCase();
 
-    int keywordLength = keyword.length();
-    int phraseLength = phrase.length();
+    // For loop that copies the original keyword into the keyword string that is the same length of the original message
+    for (int i = 0; i < message.length();){
+      for (int j = 0; j < keyword.length() + 2;){
+        // If the keyword string length is equal to the message length, the loop breaks
+        if (keywordString.length() == message.length()){
+          break;
+        }
 
-    // The 2D array that contains the phrase letter/keyword letter pairs.
-    char[][] keywordPhrasePairs = new char[phraseLength][2];
+        /* Checks to see if the character is a letter, if not, 
+        it does not need to be encrypted and is copied directly from the message string into
+        the keyword string */
+        // Otherwise the keyword character at "j" position is copied into the keyword string and increments the "j" variable
+        if (!Character.isLetter(message.charAt(i))){
+          keywordString += message.charAt(i);
+        } else {
+          keywordString += keyword.charAt(j);
+          j++;
+        }
 
-    /*
-     * Iterate over the phrase:
-     * 
-     * `phraseIndex` is automatically incremented, since this is just pulling the next
-     * character in the phrase.
-     * 
-     * `keywordCounter` is manually incremented, because we don't want to grab the next letter
-     * in the keyword if we encounter a non-alphabet character in the phrase. A keyword letter should not
-     * map to a non-alphabet character. Non-alphabet characters are still added to the array, but are not included
-     * in the counting process.
-     */
-    for (int phraseIndex = 0, keywordCounter = 0; phraseIndex < phraseLength; phraseIndex++) 
-    {
-      // Reset the keyword index after the keyword length has been exhausted.
-      int keywordIndex = keywordCounter % keywordLength;
-
-      // Grab the next phrase letter & keyword letter
-      char phraseLetter = phrase.charAt(phraseIndex);
-      char keywordLetter = keyword.charAt(keywordIndex);
-
-      // 1) If the phrase letter is non-alphabetic, set the keyword to the phrase character
-      // 2) Do not increment the keywordCounter, since we are not including the keyword letter for non-alphabetic characters
-      if (!Character.isLetter(phraseLetter))
-        keywordLetter = phraseLetter;
-
-      // 1) Otherwise, increment the keywordCounter to grab the next keyword letter during the next iteration.
-      // 2) Increment the keywordCounter, since it is an alphabetic character
-      else
-        keywordCounter++;
-
-      /*
-       * Create the phraseLetter/keywordLetter pair as a character array. 
-       * This becomes a new row in the 2D `keywordPhrasePairs` array, with
-       * the phrase letter being in column 1 and the keyword letter in column 2.
-       */
-      keywordPhrasePairs[phraseIndex] = new char[] 
-      {
-        phraseLetter,
-        keywordLetter
-      };
-
-      programLogs.add("{ " + phraseLetter + ", " + keywordLetter + " }");
+        // If variable j is equal to the keyword length, it is reset so it can start from the begining of the keyword
+        if (j == keyword.length()){
+          j = 0;
+        }
+        // Variable "i" is always incremented through each loop no matter what
+        i++;
+      }
     }
 
-    return keywordPhrasePairs;
+    // For loop that pairs the characters of the keywordString and the message into an array
+    for (int i = 0; i < keywordPairs.length; i++){
+      // Copies each letter of the message string along the first column
+      keywordPairs[i][0] = message.charAt(i);
+      // Copies each letter of the keyword string string along the second column
+      keywordPairs[i][1] = keywordString.charAt(i);
+    }
+
+    return keywordPairs;
   }
 
   /*
