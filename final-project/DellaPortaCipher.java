@@ -2,12 +2,12 @@
  * Will, Jaylen, Alex 
  */
 
- import java.io.BufferedWriter;
- import java.io.File;
- import java.io.FileWriter;
- import java.io.IOException;
- import java.util.Scanner;
- import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class DellaPortaCipher {
   /*
@@ -19,12 +19,28 @@ public class DellaPortaCipher {
   // Constants
   final public static int PORTA_MATRIX_SIZE = 13;
 
+  // File I/O
   final public static String OUTPUT_PATH = "/output.txt";
   final public static String PROGRAM_LOG_PATH = "/programlog.txt";
 
+  final public static String ERROR_PREFIX = "[ ! ] Error: ";
+  final public static String DEBUG_PREFIX = "[ ? ] ";
+  final public static String WARNING_PREFIX = "[ * ] ";
+
   // States & Variables
-  public static boolean inDebugMode = false;
+  public static boolean debugMode = false;
   public static ArrayList<String> programLogs = new ArrayList<>();
+
+  /*
+   * ---------
+   * | Enums |
+   * ---------
+   */
+   public static enum InputValidation 
+   {
+    VALID,
+    INVALID
+   }
 
   /*
    * println(<Object> message):
@@ -62,30 +78,30 @@ public class DellaPortaCipher {
    * @return void
    */
   public static void error(String message) {
-    println("[ ! ] ERROR: " + message);
+    println(ERROR_PREFIX + message);
   }
 
   // conditional println() when debug mode is enabled
-  public static void debugPrintln(Object message) {
-    if (inDebugMode) println("[ ? ] " + message);
+  public static void debug__println(Object message) {
+    if (debugMode) println(DEBUG_PREFIX + message);
   }
 
   // conditional print() when debug mode is enabled
-  public static void debugPrint(Object message) {
-    if (inDebugMode) print("\n[ ? ] " + message);
+  public static void debug__print(Object message) {
+    if (debugMode) print("\n" + DEBUG_PREFIX + message);
   }
 
   // conditional printf() when debug mode is enabled
-  public static void debugPrintf(String template, Object ...args) {
-    if (inDebugMode) {
-      println("");
-      printf("[ ? ] " + template, args);
+  public static void debug__printf(String template, Object ...args) 
+  {
+    if (debugMode) {
+      printf("\n" + DEBUG_PREFIX + template, args);
     }
   }
 
   // conditional error() when debug mode is enabled
-  public static void debugError(String message) {
-    if (inDebugMode) error(message);
+  public static void debug__error(String message) {
+    if (debugMode) error(message);
   }
 
   /*
@@ -128,20 +144,83 @@ public class DellaPortaCipher {
     for (int i = 1; i <= choices.length; i++)
       printf("%s) %s\n", i, choices[i - 1]);
 
-    // display the prompt message
-    print("\n> " + promptMessage);
-
     // collect user input
-    int itemNumber = input.nextInt();
-    input.nextLine();
+    println("");
+    InputValidation menuChoiceValidation = InputValidation.INVALID;
+
+    int itemNumber = 0; do 
+    {
+      // display the prompt message
+      print("> " + promptMessage);
+      String menuChoice = input.nextLine();
+
+      // handle input validation for selecting the menu item
+      try 
+      {
+        // if this fails, go to catch
+        itemNumber = Integer.parseInt(menuChoice);
+
+        // if this fails, go to catch and give "out of bounds" error
+        if (itemNumber < 1 || itemNumber > choices.length)
+          throw new Exception("Out of bounds. Choice must be between 1 and " + choices.length + ", user entered: \"" + itemNumber + "\"");
+
+        // if validation passed, then update the menuChoiceValidation state to VALID
+        menuChoiceValidation = InputValidation.VALID;
+
+      // handle caught errors
+      } catch (Exception e) 
+      {
+        addErrorLog("Invalid menu input: " + e.getMessage());
+        println("Invalid menu item. Try again.");
+      }
+    } while (menuChoiceValidation == InputValidation.INVALID);
 
     return itemNumber;
   }
 
+  /*
+   * promptBoolean(<Scanner> input, <String> message):
+   * 
+   * Prompts the user for a binary choice (yes/no) selection
+   * 
+   * @param <Scanner> input: The scanner object
+   * @param <String> message: The message to prompt for choice selection
+   * @return <boolean> answer: A true or false value (true if input = "y", false otherwise)
+   */
   public static boolean promptBoolean(Scanner input, String message)
   {
-    String submission = promptMessage(input, message + " (y/n): ");
-    return submission.toLowerCase().equals("y");
+    InputValidation answerValidation = InputValidation.INVALID;
+
+    // begin looped validation checking
+    boolean answer = false; do
+    {
+      // prompt input
+      print("> " + message + " (y/n): ");
+      String submission = input.nextLine();
+
+      try 
+      {
+        // if not "y" or "n", throw invalid input error
+        if (!(submission.equals("y") || submission.equals("n"))) {
+          throw new Exception("Choice must be \"y\" or \"n\", user entered: \"" + submission + "\"");
+
+        // else if "y", then set answer to true
+        } else if (submission.equals("y")) {
+          answer = true;
+        }
+
+        // no condition for "n" because `answer` is false by default
+        // at this point the validation passed
+
+        answerValidation = InputValidation.VALID;
+      } catch (Exception e) 
+      {
+        addErrorLog("Invalid boolean input: " + e.getMessage());
+        println("Invalid boolean input. Try again.");
+      }
+    } while (answerValidation == InputValidation.INVALID);
+
+    return answer;
   }
 
   /*
@@ -157,45 +236,43 @@ public class DellaPortaCipher {
     return dir + path;
   }
 
-  public static void addLog(String message) {
-    programLogs.add(message);
-  }
-
+  /*
+   * updateLogs(<File> programLogFile, <boolean> append):
+   * 
+   * Updates a given file for storing program logs with the global
+   * programLogs array list entries. This method only writes to a file
+   * if `debugMode` is true. Once the file is written to, the global
+   * `programLogs` array list will be cleared.
+   * 
+   * @param <File> programLogFile: The output file of the program logs
+   * @param <boolean> append: Determines if the logs will append the updated information
+   * or overwrite the existng logs with the new logs. true = append, false = overwrite.
+   */
   public static void updateLogs(File programLogFile, boolean append) 
   {
-    if (!getDebugMode()) return;
+    // ignore this method when not in debugMode
+    if (!debugMode) return;
 
+    // all of the current programLogs concatenated together
     String text = "";
 
     for (String log : programLogs)
       text += log + "\n";
 
     writeFile(programLogFile, text, append);
-    clearLogs();
-  }
-
-  public static void addErrorLog(String message) {
-    addLog("ERROR: " + message);
-  }
-
-  public static void addWarningLog(String message) {
-    addLog("WARNING: " + message);
-  }
-
-  public static void clearLogs() {
     programLogs.clear();
   }
 
-  public static ArrayList<String> getLogs() {
-    return programLogs;
+  public static void addErrorLog(String message) {
+    programLogs.add(ERROR_PREFIX + message);
+  }
+
+  public static void addWarningLog(String message) {
+    programLogs.add(WARNING_PREFIX + message);
   }
 
   public static void setDebugMode(boolean enabled) {
-    inDebugMode = enabled;
-  }
-
-  public static boolean getDebugMode() {
-    return inDebugMode;
+    debugMode = enabled;
   }
 
   /*
@@ -219,7 +296,7 @@ public class DellaPortaCipher {
 
   //   } catch (IOException e) 
   //   {
-  //     debugError(e.getMessage());
+  //     debug__error(e.getMessage());
   //     return "READ_ERROR";
   //   }
   // }
@@ -239,19 +316,24 @@ public class DellaPortaCipher {
    */
   public static boolean establishFile(File file, boolean required) 
   {
-    String log = "";
+    String log;
 
     try 
     {
-      // check if the file is required and the file doesn't exist
-      // if true: create the file and exit
-      // if false: continue
+      /*
+       * check if the file is required and the file doesn't exist
+       * if true: create the file and exit
+       * if false: continue
+       * 
+       * If file is required and does not exist, program will create the
+       * file and then exit
+       */
       if (required && !file.exists()) 
       {
         log = "Required file '%s' does not exist (creating blank txt file)";
 
-        debugPrintf(log + "\n", file.getName());
-        addLog(log.replaceAll("%s", file.getName()));
+        debug__printf(log + "\n", file.getName());
+        programLogs.add(log.replaceAll("%s", file.getName()));
 
         file.createNewFile();
         System.exit(0);
@@ -265,8 +347,8 @@ public class DellaPortaCipher {
       {
         log = "New file created: %s";
 
-        debugPrintf(log + "\n", file.getName());
-        addLog(log.replaceAll("%s", file.getName()));
+        debug__printf(log + "\n", file.getName());
+        programLogs.add(log.replaceAll("%s", file.getName()));
 
         return true;
       }
@@ -274,14 +356,14 @@ public class DellaPortaCipher {
       // if file was not created, announce that it already exists
       log = "File '%s' already exists";
 
-      debugPrintf(log + "\n", file.getName());
-      addLog(log.replaceAll("%s", file.getName()));
+      debug__printf(log + "\n", file.getName());
+      programLogs.add(log.replaceAll("%s", file.getName()));
 
       return false;
 
     } catch(IOException e) 
     {
-      debugError(e.getMessage());
+      debug__error(e.getMessage());
       addErrorLog("Issue establishing file: " + e.getMessage());
 
       return false;
@@ -304,11 +386,11 @@ public class DellaPortaCipher {
 
       } catch (IOException e) {
         addErrorLog("Issue writing to file: " + e.getMessage());
-        debugError(e.getMessage());
+        debug__error(e.getMessage());
       }
     } catch (IOException e) {
       addErrorLog("Issue creating FileWriter: " + e.getMessage());
-      debugError(e.getMessage());
+      debug__error(e.getMessage());
     }
   }
 
@@ -339,7 +421,7 @@ public class DellaPortaCipher {
    */
   public static char[][] getKeywordPhrasePairs(String phrase, String keyword) 
   {
-    addLog("Mapping keyword letters to phrase letters...\n");
+    programLogs.add("Mapping keyword letters to phrase letters...\n");
 
     // convert keyword and phrase to lowercase to make bytecode-checking easier
     keyword = keyword.toLowerCase();
@@ -392,7 +474,7 @@ public class DellaPortaCipher {
         keywordLetter
       };
 
-      addLog("{ " + phraseLetter + ", " + keywordLetter + " }");
+      programLogs.add("{ " + phraseLetter + ", " + keywordLetter + " }");
     }
 
     return keywordPhrasePairs;
@@ -469,7 +551,7 @@ public class DellaPortaCipher {
    */
   public static String convertPortaCipher(String phrase, String keyword) 
   {
-    addLog("Preparing to convert phrase...");
+    programLogs.add("Preparing to convert phrase...");
 
     // create the keyword/phrase letter pairs
     char[][] keywordPhrasePairs = getKeywordPhrasePairs(phrase, keyword);
@@ -477,7 +559,7 @@ public class DellaPortaCipher {
     // the final encrypted/decrypted result
     String text = "";
 
-    addLog("\nPreparing to iterate over keywordPhrasePairs to find letter compliments...\n");
+    programLogs.add("\nPreparing to iterate over keywordPhrasePairs to find letter compliments...\n");
 
     for (char[] row : keywordPhrasePairs) 
     {
@@ -489,10 +571,10 @@ public class DellaPortaCipher {
       char encryptedLetter = getPortaCompliment(phraseLetter, keywordLetter);
       text += encryptedLetter;
 
-      addLog(phraseLetter + " -> " + encryptedLetter);
+      programLogs.add(phraseLetter + " -> " + encryptedLetter);
     }
 
-    addLog("");
+    programLogs.add("");
     return text;
   }
 
@@ -542,30 +624,36 @@ public class DellaPortaCipher {
          * is running. An output file will only be updated or generated if the
          * algorithm is running in debug mode
          */
+        // reset debug mode to factory
         setDebugMode(false);
-        clearLogs();
+
+        // clear old logs and begin new logs
+        programLogs.clear();
+
+        // create or locate necessary files
+        establishFile(outputFile, false);
+        establishFile(programLogFile, false);
+
+        // overwrite programLogFile with new beginning logs
         writeFile(programLogFile, "START\n", false);
 
         // user input parameters
         println("\n======= DELLA PORTA CIPHER ===========================\n");
-        addLog("Waiting for user input...");
+        programLogs.add("Waiting for user input...");
         updateLogs(programLogFile, true);
         setDebugMode(promptBoolean(input, "Run in debug mode"));
 
-        addLog("Set debug mode to: " + getDebugMode());
+        programLogs.add("Set debug mode to: " + debugMode);
         updateLogs(programLogFile, true);
 
         println("");
 
         String phrase = promptMessage(input, "Enter phrase: ");
-        addLog("Set phrase to: \"" + phrase + "\"");
+        programLogs.add("Set phrase to: \"" + phrase + "\"");
         updateLogs(programLogFile, true);
 
         String keyword = promptMessage(input, "Enter keyword: ");
-        addLog("Set keyword to: \"" + keyword + "\"");
-
-        establishFile(outputFile, false);
-        establishFile(programLogFile, false);
+        programLogs.add("Set keyword to: \"" + keyword + "\"");
 
         updateLogs(programLogFile, true);
 
@@ -575,7 +663,7 @@ public class DellaPortaCipher {
         if (!containsExclusivelyLetters(keyword)) {
           addErrorLog("Invalid keyword");
           updateLogs(programLogFile, true);
-          error("Keyword must be a single word containing only alphabet characters");
+          error("Keyword must be a single word containing only alphabet characters\n");
           System.exit(0);
         }
 
@@ -587,8 +675,8 @@ public class DellaPortaCipher {
         writeFile(outputFile, output, false);
 
         // end of the main program logic
-        addLog("END");
-        addLog("Waiting on user selection...");
+        programLogs.add("END");
+        programLogs.add("Waiting on user selection...");
         updateLogs(programLogFile, true);
 
         // prompt the user with some end-of-run options
@@ -605,7 +693,7 @@ public class DellaPortaCipher {
         // if the user choose to exit the program
         switch (menuItem) {
           case 2:
-            println("\nGoodbye!");
+            println("\nGoodbye!\n");
             break main;
         }
       }

@@ -1,246 +1,48 @@
 START
-Waiting for user input...
-Set debug mode to: true
-Set phrase to: "its the end of the world as we know it. i said it's the end of the world as we know it. and i feel fineeeee oh YEAH"
-Set keyword to: "spongebob"
 File 'output.txt' already exists
 File 'programlog.txt' already exists
+Waiting for user input...
+Set debug mode to: true
+Set phrase to: "testing the text"
+Set keyword to: "world"
 Preparing to convert phrase...
 Mapping keyword letters to phrase letters...
 
-{ i, s }
-{ t, p }
-{ s, o }
-{  ,   }
-{ t, n }
-{ h, g }
-{ e, e }
-{  ,   }
-{ e, b }
-{ n, o }
-{ d, b }
-{  ,   }
-{ o, s }
-{ f, p }
-{  ,   }
-{ t, o }
-{ h, n }
-{ e, g }
-{  ,   }
-{ w, e }
-{ o, b }
-{ r, o }
-{ l, b }
-{ d, s }
-{  ,   }
-{ a, p }
-{ s, o }
-{  ,   }
-{ w, n }
-{ e, g }
-{  ,   }
-{ k, e }
-{ n, b }
-{ o, o }
-{ w, b }
-{  ,   }
-{ i, s }
-{ t, p }
-{ ., . }
-{  ,   }
-{ i, o }
-{  ,   }
-{ s, n }
-{ a, g }
-{ i, e }
-{ d, b }
-{  ,   }
-{ i, o }
-{ t, b }
-{ ', ' }
-{ s, s }
-{  ,   }
-{ t, p }
-{ h, o }
-{ e, n }
-{  ,   }
-{ e, g }
-{ n, e }
-{ d, b }
-{  ,   }
-{ o, o }
-{ f, b }
-{  ,   }
-{ t, s }
-{ h, p }
+{ t, w }
 { e, o }
+{ s, r }
+{ t, l }
+{ i, d }
+{ n, w }
+{ g, o }
 {  ,   }
-{ w, n }
-{ o, g }
-{ r, e }
-{ l, b }
-{ d, o }
+{ t, r }
+{ h, l }
+{ e, d }
 {  ,   }
-{ a, b }
-{ s, s }
-{  ,   }
-{ w, p }
+{ t, w }
 { e, o }
-{  ,   }
-{ k, n }
-{ n, g }
-{ o, e }
-{ w, b }
-{  ,   }
-{ i, o }
-{ t, b }
-{ ., . }
-{  ,   }
-{ a, s }
-{ n, p }
-{ d, o }
-{  ,   }
-{ i, n }
-{  ,   }
-{ f, g }
-{ e, e }
-{ e, b }
-{ l, o }
-{  ,   }
-{ f, b }
-{ i, s }
-{ n, p }
-{ e, o }
-{ e, n }
-{ e, g }
-{ e, e }
-{ e, b }
-{  ,   }
-{ o, o }
-{ h, b }
-{  ,   }
-{ y, s }
-{ e, p }
-{ a, o }
-{ h, n }
+{ x, r }
+{ t, l }
 
 Preparing to iterate over keywordPhrasePairs to find letter compliments...
 
-i -> r
-t -> m
-s -> l
-  ->  
-t -> a
-h -> x
-e -> t
-  ->  
-e -> r
-n -> g
-d -> q
-  ->  
-o -> f
-f -> z
-  ->  
-t -> m
-h -> n
-e -> u
-  ->  
-w -> h
-o -> b
-r -> k
-l -> y
-d -> z
-  ->  
-a -> u
-s -> l
-  ->  
-w -> d
-e -> u
-  ->  
-k -> z
-n -> a
-o -> h
-w -> j
-  ->  
-i -> r
-t -> m
-. -> .
-  ->  
-i -> p
-  ->  
-s -> m
-a -> q
-i -> x
-d -> q
-  ->  
-i -> p
-t -> g
-' -> '
-s -> j
-  ->  
-t -> m
-h -> o
-e -> x
-  ->  
-e -> u
-n -> l
-d -> q
-  ->  
-o -> h
-f -> s
-  ->  
-t -> k
-h -> o
+t -> i
 e -> y
+s -> k
+t -> b
+i -> w
+n -> c
+g -> n
   ->  
-w -> d
-o -> l
-r -> c
-l -> y
-d -> x
+t -> l
+h -> z
+e -> s
   ->  
-a -> n
-s -> j
-  ->  
-w -> c
+t -> i
 e -> y
-  ->  
-k -> q
-n -> k
-o -> m
-w -> j
-  ->  
-i -> p
-t -> g
-. -> .
-  ->  
-a -> w
-n -> g
-d -> x
-  ->  
-i -> o
-  ->  
-f -> v
-e -> t
-e -> r
-l -> s
-  ->  
-f -> s
-i -> r
-n -> g
-e -> y
-e -> x
-e -> u
-e -> t
-e -> r
-  ->  
-o -> h
-h -> u
-  ->  
-y -> c
-e -> y
-a -> u
-h -> n
+x -> c
+t -> b
 
 END
 Waiting on user selection...
