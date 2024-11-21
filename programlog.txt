@@ -1,1 +1,5 @@
 START
+File 'output.txt' already exists
+File 'programlog.txt' already exists
+Waiting for user input...
+Set debug mode to: true
