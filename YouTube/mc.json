@@ -1,1 +1,0 @@
-item modify entity @a weapon {function: 'minecraft:filtered', item_filter: {items: ['minecraft:water_bottle'], components: {'minecraft:max_stack_size': 1}}, modifier: {function: 'minecraft:set_components', components: {'minecraft:max_stack_size': 32}}}
