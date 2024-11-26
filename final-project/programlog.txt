@@ -5,46 +5,91 @@ File 'output.txt' already exists
 File 'programlog.txt' already exists
 Waiting for user input...
 Set debug mode to: true
-Set phrase to: "alrighty lets see aboput this one okay? okay good."
+Set message to: "soe message"
+Set keyword to: "ok"
+Preparing to convert message...
+Preparing to create keyword/message pairs array...
+
+{ s, o }
+{ o, k }
+{ e, o }
+{  ,   }
+{ m, k }
+{ e, o }
+{ s, k }
+{ s, o }
+{ a, k }
+{ g, o }
+{ e, k }
+
+Preparing to iterate over keywordMessagePairs to find letter compliments...
+
+s -> l
+o -> j
+e -> y
+  ->  
+m -> r
+e -> y
+s -> a
+s -> l
+a -> s
+g -> n
+e -> w
+
+END
+
+For more info, visit: https://will-blog-sigma.vercel.app/
+
+----- START ----------------------------
+
+File 'output.txt' already exists
+File 'programlog.txt' already exists
+Waiting for user input...
+Set debug mode to: true
+Set message to: "some another message"
 Set keyword to: "yes"
-Preparing to convert phrase...
-Mapping keyword letters to phrase letters...
+Preparing to convert message...
+Preparing to create keyword/message pairs array...
 
-{ a, y }
-{ l, e }
-{ r, s }
-{ i, y }
-{ g, e }
-{ h, s }
-{ t, y }
-{ y, e }
-{  ,   }
-{ l, s }
-{ e, y }
-{ t, e }
-{ s, s }
-{  ,   }
 { s, y }
-...35
+{ o, e }
+{ m, s }
+{ e, y }
+{  ,   }
+{ a, e }
+{ n, s }
+{ o, y }
+{ t, e }
+{ h, s }
+{ e, y }
+{ r, e }
+{  ,   }
+{ m, s }
+{ e, y }
+{ s, e }
+{ s, s }
+{ a, y }
+{ g, e }
+{ e, s }
 
-Preparing to iterate over keywordPhrasePairs to find letter compliments...
+Preparing to iterate over keywordMessagePairs to find letter compliments...
 
-a -> z
-l -> n
-r -> i
-i -> u
-g -> v
-h -> q
-t -> h
-y -> j
-  ->  
-l -> u
-e -> q
-t -> e
-s -> j
-  ->  
 s -> g
-...35
+o -> m
+m -> v
+e -> q
+  ->  
+a -> p
+n -> e
+o -> c
+t -> e
+h -> q
+e -> q
+r -> c
+  ->  
+m -> v
+e -> q
+...5
 
 END
 

@@ -3,3 +3,140 @@ File 'output.txt' already exists
 File 'programlog.txt' already exists
 Waiting for user input...
 Set debug mode to: true
+Set message to: "this'll be a lot! of punctuation 123 some numbers ;) there too "
+Set keyword to: "goldfish"
+Preparing to convert message...
+Preparing to create keyword/message pairs array...
+
+{ t, g }
+{ h, o }
+{ i, l }
+{ s, d }
+{ ', ' }
+{ l, f }
+{ l, i }
+{  ,   }
+{ b, s }
+{ e, h }
+{  ,   }
+{ a, g }
+{  ,   }
+{ l, o }
+{ o, l }
+{ t, d }
+{ !, ! }
+{  ,   }
+{ o, f }
+{ f, i }
+{  ,   }
+{ p, s }
+{ u, h }
+{ n, g }
+{ c, o }
+{ t, l }
+{ u, d }
+{ a, f }
+{ t, i }
+{ i, s }
+{ o, h }
+{ n, g }
+{  ,   }
+{ 1, 1 }
+{ 2, 2 }
+{ 3, 3 }
+{  ,   }
+{ s, o }
+{ o, l }
+{ m, d }
+{ e, f }
+{  ,   }
+{ n, i }
+{ u, s }
+{ m, h }
+{ b, g }
+{ e, o }
+{ r, l }
+{ s, d }
+{  ,   }
+{ ;, ; }
+{ ), ) }
+{  ,   }
+{ t, f }
+{ h, i }
+{ e, s }
+{ r, h }
+{ e, g }
+{  ,   }
+{ t, o }
+{ o, l }
+{ o, d }
+{  ,   }
+
+Preparing to iterate over keywordMessagePairs to find letter compliments...
+
+t -> d
+h -> o
+i -> n
+s -> e
+' -> '
+l -> n
+l -> p
+  ->  
+b -> x
+e -> u
+  ->  
+a -> q
+  ->  
+l -> s
+o -> j
+t -> f
+! -> !
+  ->  
+o -> m
+f -> w
+  ->  
+p -> g
+u -> e
+n -> k
+c -> w
+t -> b
+u -> g
+a -> p
+t -> c
+i -> r
+o -> l
+n -> k
+  ->  
+1 -> 1
+2 -> 2
+3 -> 3
+  ->  
+s -> l
+o -> j
+m -> n
+e -> t
+  ->  
+n -> j
+u -> l
+m -> p
+b -> r
+e -> y
+r -> m
+s -> e
+  ->  
+; -> ;
+) -> )
+  ->  
+t -> e
+h -> y
+e -> n
+r -> b
+e -> u
+  ->  
+t -> m
+o -> j
+o -> a
+  ->  
+
+END
+Waiting on user selection...
