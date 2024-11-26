@@ -2,6 +2,7 @@
  * Will, Jaylen, Alex 
  */
 
+import java.awt.Desktop;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -18,6 +19,7 @@ public class DellaPortaCipher {
 
   // Constants
   final public static int PORTA_MATRIX_SIZE = 13;
+  final public static int PROGRAM_LOG_MAX_PAIRS = 15;
 
   // File I/O
   final public static String OUTPUT_PATH = "/output.txt";
@@ -29,6 +31,7 @@ public class DellaPortaCipher {
 
   // States & Variables
   public static boolean debugMode = false;
+
   public static ArrayList<String> programLogs = new ArrayList<>();
 
   /*
@@ -474,7 +477,10 @@ public class DellaPortaCipher {
         keywordLetter
       };
 
-      programLogs.add("{ " + phraseLetter + ", " + keywordLetter + " }");
+      if (phraseIndex < PROGRAM_LOG_MAX_PAIRS)
+        programLogs.add("{ " + phraseLetter + ", " + keywordLetter + " }");
+      else if (phraseIndex == PROGRAM_LOG_MAX_PAIRS)
+        programLogs.add("..." + (phraseLength - PROGRAM_LOG_MAX_PAIRS));
     }
 
     return keywordPhrasePairs;
@@ -561,9 +567,11 @@ public class DellaPortaCipher {
 
     programLogs.add("\nPreparing to iterate over keywordPhrasePairs to find letter compliments...\n");
 
-    for (char[] row : keywordPhrasePairs) 
+    for (int i = 0; i < keywordPhrasePairs.length; i++) 
     {
       // extract the mapped phrase and keyword letters from each row
+      char[] row = keywordPhrasePairs[i];
+
       char phraseLetter = row[0];
       char keywordLetter = row[1];
 
@@ -571,7 +579,10 @@ public class DellaPortaCipher {
       char encryptedLetter = getPortaCompliment(phraseLetter, keywordLetter);
       text += encryptedLetter;
 
-      programLogs.add(phraseLetter + " -> " + encryptedLetter);
+      if (i < PROGRAM_LOG_MAX_PAIRS)
+        programLogs.add(phraseLetter + " -> " + encryptedLetter);
+      else if (i == PROGRAM_LOG_MAX_PAIRS)
+        programLogs.add("..." + (keywordPhrasePairs.length - PROGRAM_LOG_MAX_PAIRS));
     }
 
     programLogs.add("");
@@ -634,14 +645,22 @@ public class DellaPortaCipher {
         establishFile(outputFile, false);
         establishFile(programLogFile, false);
 
-        // overwrite programLogFile with new beginning logs
-        writeFile(programLogFile, "START\n", false);
-
         // user input parameters
         println("\n======= DELLA PORTA CIPHER ===========================\n");
         programLogs.add("Waiting for user input...");
         updateLogs(programLogFile, true);
         setDebugMode(promptBoolean(input, "Run in debug mode"));
+
+        // overwrite programLogFile with new beginning logs
+        if (debugMode) {
+          boolean resetProgramLogs = promptBoolean(input, "Reset program logs");
+
+          writeFile(
+            programLogFile, 
+            "\n----- START ----------------------------\n\n",
+            !resetProgramLogs
+          );
+        }
 
         programLogs.add("Set debug mode to: " + debugMode);
         updateLogs(programLogFile, true);
@@ -674,9 +693,20 @@ public class DellaPortaCipher {
         // write to output file
         writeFile(outputFile, output, false);
 
+        // open the output and programlog files
+        try {
+          if (debugMode) {
+            Desktop.getDesktop().open(programLogFile);
+          }
+
+          Desktop.getDesktop().open(outputFile);
+        } catch (IOException e) {
+          error("Could not open output file");
+        }
+
         // end of the main program logic
         programLogs.add("END");
-        programLogs.add("Waiting on user selection...");
+        programLogs.add("\nFor more info, visit: https://will-blog-sigma.vercel.app/");
         updateLogs(programLogFile, true);
 
         // prompt the user with some end-of-run options
@@ -693,7 +723,6 @@ public class DellaPortaCipher {
         // if the user choose to exit the program
         switch (menuItem) {
           case 2:
-            println("\nGoodbye!\n");
             break main;
         }
       }

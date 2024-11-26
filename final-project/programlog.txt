@@ -1,0 +1,51 @@
+
+----- START ----------------------------
+
+File 'output.txt' already exists
+File 'programlog.txt' already exists
+Waiting for user input...
+Set debug mode to: true
+Set phrase to: "alrighty lets see aboput this one okay? okay good."
+Set keyword to: "yes"
+Preparing to convert phrase...
+Mapping keyword letters to phrase letters...
+
+{ a, y }
+{ l, e }
+{ r, s }
+{ i, y }
+{ g, e }
+{ h, s }
+{ t, y }
+{ y, e }
+{  ,   }
+{ l, s }
+{ e, y }
+{ t, e }
+{ s, s }
+{  ,   }
+{ s, y }
+...35
+
+Preparing to iterate over keywordPhrasePairs to find letter compliments...
+
+a -> z
+l -> n
+r -> i
+i -> u
+g -> v
+h -> q
+t -> h
+y -> j
+  ->  
+l -> u
+e -> q
+t -> e
+s -> j
+  ->  
+s -> g
+...35
+
+END
+
+For more info, visit: https://will-blog-sigma.vercel.app/
