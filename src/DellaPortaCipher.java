@@ -1,7 +1,16 @@
 /*
- * Will, Jaylen, Alex 
+ * Authors: Will, Jaylen, Alex
+ * Written: 11/22/2024
+ * 
+ * DELLA PORTA CIPHER - "Shifting Method"
+ * 
+ * This application takes text input from the user to encrypt
+ * or decrypt according to the Della Porta Cipher. It has several
+ * debug options, and output can be read through the terminal
+ * or through the output text files.
  */
 
+ // import classes/libraries
 import java.awt.Desktop;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,21 +26,27 @@ public class DellaPortaCipher {
    * -------------------
    */
 
+  /* OVERALL */
+
   // Constants
   final public static int PORTA_MATRIX_SIZE = 13;
   final public static int PROGRAM_LOG_MAX_PAIRS = 15;
 
   // File I/O
-  final public static String OUTPUT_PATH = "/output.txt";
-  final public static String PROGRAM_LOG_PATH = "/programlog.txt";
+  final public static String OUTPUT_PATH = "/output/output.txt";
+  final public static String PROGRAM_LOG_PATH = "/output/programlog.txt";
 
+  // Output prefixes
   final public static String ERROR_PREFIX = "[ ! ] Error: ";
   final public static String DEBUG_PREFIX = "[ ? ] ";
   final public static String WARNING_PREFIX = "[ * ] ";
 
-  // States & Variables
+  /* STATES & VARIABLES */
+
+  // Togglable
   public static boolean debugMode = false;
 
+  // Program logs
   public static ArrayList<String> programLogs = new ArrayList<>();
 
   /*
@@ -279,32 +294,6 @@ public class DellaPortaCipher {
   }
 
   /*
-   * getFileSource(<File> file):
-   * 
-   * Compile all text source lines in the file into one string
-   * 
-   * @param file: The file object to read and convert to a string
-   * @returns: <String> fileSource
-   */
-  // public static String getFileSource(File file) 
-  // {
-  //   String source = "";
-
-  //   try (Scanner reader = new Scanner(file)) 
-  //   {
-  //     while (reader.hasNextLine()) 
-  //       source += reader.nextLine() + "\n";
-
-  //     return source;
-
-  //   } catch (IOException e) 
-  //   {
-  //     debug__error(e.getMessage());
-  //     return "READ_ERROR";
-  //   }
-  // }
-
-  /*
    * establishFile(<File> file, <boolean> required):
    * 
    * Create a file with the given path in the `file` argument, unless it
@@ -422,7 +411,8 @@ public class DellaPortaCipher {
    * @param <String> message: The message that maps to the keyword letters
    * @return <char[][]> getKeywordMessagePairs: The 2D array containing each pair of keyword letters mapping to message letters
    */
-  public static char[][] getKeywordMessagePairs(String message, String keyword){
+  public static char[][] getKeywordMessagePairs(String message, String keyword)
+  {
     // Initializes the keyword string, where the keyword will be copied into it until the string length is equal to that of the message string
     String keywordString = "";
 
@@ -468,7 +458,11 @@ public class DellaPortaCipher {
       // Copies each letter of the keyword string string along the second column
       keywordPairs[i][1] = keywordString.charAt(i);
 
-      programLogs.add("{ " + keywordPairs[i][0] + ", " + keywordPairs[i][1] + " }");
+      // Update the program logs accordingly
+      if (i < PROGRAM_LOG_MAX_PAIRS)
+        programLogs.add("{ " + keywordPairs[i][0] + ", " + keywordPairs[i][1] + " }");
+      else if (i == PROGRAM_LOG_MAX_PAIRS)
+        programLogs.add("..." + (keywordPairs.length - PROGRAM_LOG_MAX_PAIRS));
     }
 
     return keywordPairs;
@@ -567,6 +561,7 @@ public class DellaPortaCipher {
       char encryptedLetter = getPortaCompliment(messageLetter, keywordLetter);
       text += encryptedLetter;
 
+      // Update program log files accordingly
       if (i < PROGRAM_LOG_MAX_PAIRS)
         programLogs.add(messageLetter + " -> " + encryptedLetter);
       else if (i == PROGRAM_LOG_MAX_PAIRS)
@@ -609,6 +604,7 @@ public class DellaPortaCipher {
  
   public static void main(String[] args) 
   {
+    // Locate output files
     File outputFile = new File(getPath(OUTPUT_PATH));
     File programLogFile = new File(getPath(PROGRAM_LOG_PATH));
 
@@ -623,23 +619,32 @@ public class DellaPortaCipher {
          * is running. An output file will only be updated or generated if the
          * algorithm is running in debug mode
          */
-        // reset debug mode to factory
+        // Reset debug mode to factory
         setDebugMode(false);
 
-        // clear old logs and begin new logs
+        // Clear old logs and begin new logs
         programLogs.clear();
 
-        // create or locate necessary files
+        // Create or locate necessary files
         establishFile(outputFile, false);
         establishFile(programLogFile, false);
 
-        // user input parameters
+        // User input parameters
         println("\n======= DELLA PORTA CIPHER ===========================\n");
         programLogs.add("Waiting for user input...");
         updateLogs(programLogFile, true);
+
+        // prompt for debug mode
         setDebugMode(promptBoolean(input, "Run in debug mode"));
 
-        // overwrite programLogFile with new beginning logs
+        /*
+         * ONLY IF `debugMode` is TRUE:
+         * 
+         * - options:
+         *    * resetProgramLogs: 
+         *        - if true, then programlogs.txt resets every program re-run 
+         *        - if false, then programlogs.txt is appended every program re-run
+         */
         if (debugMode) {
           boolean resetProgramLogs = promptBoolean(input, "Reset program logs");
 
@@ -650,23 +655,25 @@ public class DellaPortaCipher {
           );
         }
 
+        // Update program log
         programLogs.add("Set debug mode to: " + debugMode);
         updateLogs(programLogFile, true);
-
         println("");
 
+        // Prompt for message string
         String message = promptMessage(input, "Enter message: ");
         programLogs.add("Set message to: \"" + message + "\"");
         updateLogs(programLogFile, true);
 
+        // Prompt for keyword string
         String keyword = promptMessage(input, "Enter keyword: ");
         programLogs.add("Set keyword to: \"" + keyword + "\"");
 
+        // Update program log
         updateLogs(programLogFile, true);
-
         println("\n======================================================\n");
 
-        // input validation
+        // Input validation for keyword
         if (!containsExclusivelyLetters(keyword)) {
           addErrorLog("Invalid keyword");
           updateLogs(programLogFile, true);
@@ -674,14 +681,14 @@ public class DellaPortaCipher {
           System.exit(0);
         }
 
-        // generate the output text
+        // Generate the output text
         String output = convertPortaCipher(message, keyword).toUpperCase();
         println("=> Output: " + output);
 
-        // write to output file
+        // Write to output file
         writeFile(outputFile, output, false);
 
-        // open the output and programlog files
+        // Open the output and programlog files
         try {
           if (debugMode) {
             Desktop.getDesktop().open(programLogFile);
@@ -692,25 +699,36 @@ public class DellaPortaCipher {
           error("Could not open output file");
         }
 
-        // end of the main program logic
+        // End of the main program logic
         programLogs.add("END");
         programLogs.add("\nFor more info, visit: https://will-blog-sigma.vercel.app/");
         updateLogs(programLogFile, true);
 
-        // prompt the user with some end-of-run options
+        // Prompt the user with some end-of-run options
         int menuItem = promptMenu(
           input, 
           "Options:",
           "Choose item number: ",
           new String[] {
             "Run Again",
+            "Open Program Logs",
             "Exit"
           }
         );
 
         // if the user choose to exit the program
         switch (menuItem) {
-          case 2:
+          case 2: {
+            try { 
+              Desktop.getDesktop().open(programLogFile); 
+            } catch (Exception e) { 
+              error(e.getMessage());
+            }
+
+            break;
+          }
+
+          case 3:
             break main;
         }
       }

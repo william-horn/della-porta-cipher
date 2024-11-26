@@ -5,36 +5,24 @@ File 'output.txt' already exists
 File 'programlog.txt' already exists
 Waiting for user input...
 Set debug mode to: true
-Set message to: "soe message"
-Set keyword to: "ok"
+Set message to: "awdwa"
+Set keyword to: "f"
 Preparing to convert message...
 Preparing to create keyword/message pairs array...
 
-{ s, o }
-{ o, k }
-{ e, o }
-{  ,   }
-{ m, k }
-{ e, o }
-{ s, k }
-{ s, o }
-{ a, k }
-{ g, o }
-{ e, k }
+{ a, f }
+{ w, f }
+{ d, f }
+{ w, f }
+{ a, f }
 
 Preparing to iterate over keywordMessagePairs to find letter compliments...
 
-s -> l
-o -> j
-e -> y
-  ->  
-m -> r
-e -> y
-s -> a
-s -> l
-a -> s
-g -> n
-e -> w
+a -> p
+w -> h
+d -> s
+w -> h
+a -> p
 
 END
 
@@ -46,50 +34,28 @@ File 'output.txt' already exists
 File 'programlog.txt' already exists
 Waiting for user input...
 Set debug mode to: true
-Set message to: "some another message"
-Set keyword to: "yes"
+Set message to: "testing"
+Set keyword to: "ok"
 Preparing to convert message...
 Preparing to create keyword/message pairs array...
 
-{ s, y }
-{ o, e }
-{ m, s }
-{ e, y }
-{  ,   }
-{ a, e }
-{ n, s }
-{ o, y }
-{ t, e }
-{ h, s }
-{ e, y }
-{ r, e }
-{  ,   }
-{ m, s }
-{ e, y }
-{ s, e }
-{ s, s }
-{ a, y }
-{ g, e }
-{ e, s }
+{ t, o }
+{ e, k }
+{ s, o }
+{ t, k }
+{ i, o }
+{ n, k }
+{ g, o }
 
 Preparing to iterate over keywordMessagePairs to find letter compliments...
 
-s -> g
-o -> m
-m -> v
-e -> q
-  ->  
-a -> p
-n -> e
-o -> c
-t -> e
-h -> q
-e -> q
-r -> c
-  ->  
-m -> v
-e -> q
-...5
+t -> m
+e -> w
+s -> l
+t -> b
+i -> p
+n -> i
+g -> n
 
 END
 
