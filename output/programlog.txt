@@ -4,58 +4,48 @@
 File 'output.txt' already exists
 File 'programlog.txt' already exists
 Waiting for user input...
+Choosing DEFAULT: true
 Set debug mode to: true
-Set message to: "awdwa"
-Set keyword to: "f"
+Set message to: "The quick brown fox jumped over the lazy dog"
+Set keyword to: "lorem"
 Preparing to convert message...
 Preparing to create keyword/message pairs array...
 
-{ a, f }
-{ w, f }
-{ d, f }
-{ w, f }
-{ a, f }
+{ t, l }
+{ h, o }
+{ e, r }
+{  ,   }
+{ q, e }
+{ u, m }
+{ i, l }
+{ c, o }
+{ k, r }
+{  ,   }
+{ b, e }
+{ r, m }
+{ o, l }
+{ w, o }
+{ n, r }
+...29
 
 Preparing to iterate over keywordMessagePairs to find letter compliments...
 
-a -> p
-w -> h
-d -> s
-w -> h
-a -> p
-
-END
-
-For more info, visit: https://will-blog-sigma.vercel.app/
-
------ START ----------------------------
-
-File 'output.txt' already exists
-File 'programlog.txt' already exists
-Waiting for user input...
-Set debug mode to: true
-Set message to: "testing"
-Set keyword to: "ok"
-Preparing to convert message...
-Preparing to create keyword/message pairs array...
-
-{ t, o }
-{ e, k }
-{ s, o }
-{ t, k }
-{ i, o }
-{ n, k }
-{ g, o }
-
-Preparing to iterate over keywordMessagePairs to find letter compliments...
-
-t -> m
-e -> w
-s -> l
 t -> b
-i -> p
-n -> i
-g -> n
+h -> o
+e -> z
+  ->  
+q -> b
+u -> b
+i -> n
+c -> w
+k -> s
+  ->  
+b -> q
+r -> l
+o -> j
+w -> c
+n -> f
+...29
 
 END
 

@@ -4,10 +4,26 @@
  * 
  * DELLA PORTA CIPHER - "Shifting Method"
  * 
+ * ============
+ * --- INFO ---
+ * ============
+ * 
  * This application takes text input from the user to encrypt
  * or decrypt according to the Della Porta Cipher. It has several
  * debug options, and output can be read through the terminal
  * or through the output text files.
+ * 
+ * NOTE: if running on system earlier than windows 11, notepad windows
+ * may need to be manually navigated to in order to view the output. They 
+ * may also need to be manually closed before re-running the program, to
+ * avoid having several notepad windows at the same time.
+ * 
+ * ==============
+ * --- CONFIG --- 
+ * ==============
+ * 
+ * Program Variables:
+ *  - PORTA_MATRIX_SIZE
  */
 
  // import classes/libraries
@@ -26,10 +42,7 @@ public class DellaPortaCipher {
    * -------------------
    */
 
-  /* OVERALL */
-
   // Constants
-  final public static int PORTA_MATRIX_SIZE = 13;
   final public static int PROGRAM_LOG_MAX_PAIRS = 15;
 
   // File I/O
@@ -41,13 +54,69 @@ public class DellaPortaCipher {
   final public static String DEBUG_PREFIX = "[ ? ] ";
   final public static String WARNING_PREFIX = "[ * ] ";
 
+  // Program logs
+  final public static ArrayList<String> programLogs = new ArrayList<>();
+
   /* STATES & VARIABLES */
 
   // Togglable
   public static boolean debugMode = false;
 
-  // Program logs
-  public static ArrayList<String> programLogs = new ArrayList<>();
+  /*
+   * Console colors
+   * Source: https://nonvalet.com/posts/20210413_java_console_colors/#:~:text=To%20change%20terminal%20colors%2C%20you,names%20for%20better%20code%20readability.
+   */
+
+  public static class ConsoleColors 
+  {
+    public static final String TEXT_RESET  = "\u001B[0m";
+
+    public static final String TEXT_BLACK  = "\u001B[30m";
+    public static final String TEXT_RED    = "\u001B[31m";
+    public static final String TEXT_GREEN  = "\u001B[32m";
+    public static final String TEXT_YELLOW = "\u001B[33m";
+    public static final String TEXT_BLUE   = "\u001B[34m";
+    public static final String TEXT_PURPLE = "\u001B[35m";
+    public static final String TEXT_CYAN   = "\u001B[36m";
+    public static final String TEXT_WHITE  = "\u001B[37m";
+
+    public static final String TEXT_BRIGHT_BLACK  = "\u001B[90m";
+    public static final String TEXT_BRIGHT_RED    = "\u001B[91m";
+    public static final String TEXT_BRIGHT_GREEN  = "\u001B[92m";
+    public static final String TEXT_BRIGHT_YELLOW = "\u001B[93m";
+    public static final String TEXT_BRIGHT_BLUE   = "\u001B[94m";
+    public static final String TEXT_BRIGHT_PURPLE = "\u001B[95m";
+    public static final String TEXT_BRIGHT_CYAN   = "\u001B[96m";
+    public static final String TEXT_BRIGHT_WHITE  = "\u001B[97m";
+
+    public static final String TEXT_BG_BLACK  = "\u001B[40m";
+    public static final String TEXT_BG_RED    = "\u001B[41m";
+    public static final String TEXT_BG_GREEN  = "\u001B[42m";
+    public static final String TEXT_BG_YELLOW = "\u001B[43m";
+    public static final String TEXT_BG_BLUE   = "\u001B[44m";
+    public static final String TEXT_BG_PURPLE = "\u001B[45m";
+    public static final String TEXT_BG_CYAN   = "\u001B[46m";
+    public static final String TEXT_BG_WHITE  = "\u001B[47m";
+
+    public static final String TEXT_BRIGHT_BG_BLACK  = "\u001B[100m";
+    public static final String TEXT_BRIGHT_BG_RED    = "\u001B[101m";
+    public static final String TEXT_BRIGHT_BG_GREEN  = "\u001B[102m";
+    public static final String TEXT_BRIGHT_BG_YELLOW = "\u001B[103m";
+    public static final String TEXT_BRIGHT_BG_BLUE   = "\u001B[104m";
+    public static final String TEXT_BRIGHT_BG_PURPLE = "\u001B[105m";
+    public static final String TEXT_BRIGHT_BG_CYAN   = "\u001B[106m";
+    public static final String TEXT_BRIGHT_BG_WHITE  = "\u001B[107m";
+  }
+
+  public static String buildColoredString(String bgColor, String textColor, String str)
+  {
+    String toReturn = "";
+
+    toReturn += bgColor;
+    toReturn += textColor;
+
+    return toReturn + str + ConsoleColors.TEXT_RESET;
+  }
 
   /*
    * ---------
@@ -131,9 +200,17 @@ public class DellaPortaCipher {
    * @param <Scanner> input: The scanner object to prompt the user input
    * @param <String> message: The message to display before requesting the input
    */
-  public static String promptMessage(Scanner input, String message) {
+  public static String promptMessage(Scanner input, String message, String def) {
     print("> " + message);
-    return input.nextLine();
+    String submission = input.nextLine();
+
+    // Handle default case
+    if (submission.equals("")) {
+      print("default: " + def + "\n\n");
+      return def;
+    }
+
+    return submission;
   }
 
   /*
@@ -147,7 +224,7 @@ public class DellaPortaCipher {
    * @param <String[]> choiceArray: An array of string values to be displayed as menu items
    * @return <int> The menu item (starting at 1)
    */
-  public static int promptMenu(Scanner input, String title, String promptMessage, String[] choices)
+  public static int promptMenu(Scanner input, String title, String promptMessage, int def, String[] choices)
   {
     // create padding in between | menuTitle |
     int padding = title.length() + 4;
@@ -166,11 +243,22 @@ public class DellaPortaCipher {
     println("");
     InputValidation menuChoiceValidation = InputValidation.INVALID;
 
+    if (def > choices.length || def < 1) {
+      addErrorLog("Default value to menu prompt must be in choice list range");
+      error("Invalid menu default");
+      return -1;
+    }
+
     int itemNumber = 0; do 
     {
       // display the prompt message
       print("> " + promptMessage);
       String menuChoice = input.nextLine();
+      
+      // Handle the default case
+      if (menuChoice.equals("")) {
+        return def;
+      }
 
       // handle input validation for selecting the menu item
       try 
@@ -205,26 +293,32 @@ public class DellaPortaCipher {
    * @param <String> message: The message to prompt for choice selection
    * @return <boolean> answer: A true or false value (true if input = "y", false otherwise)
    */
-  public static boolean promptBoolean(Scanner input, String message)
+  public static boolean promptBoolean(Scanner input, String message, boolean def)
   {
     InputValidation answerValidation = InputValidation.INVALID;
 
     // begin looped validation checking
-    boolean answer = false; do
+    boolean answer = def; do
     {
       // prompt input
-      print("> " + message + " (y/n): ");
+      print("> " + message + " (y/n/Enter): ");
       String submission = input.nextLine();
 
       try 
       {
-        // if not "y" or "n", throw invalid input error
-        if (!(submission.equals("y") || submission.equals("n"))) {
-          throw new Exception("Choice must be \"y\" or \"n\", user entered: \"" + submission + "\"");
-
-        // else if "y", then set answer to true
-        } else if (submission.equals("y")) {
+        // Update answer according to input
+        if (submission.equals("y")) {
           answer = true;
+
+        } else if (submission.equals("n")) {
+          answer = false;
+
+        } else if (submission.equals("")) {
+          programLogs.add("Choosing DEFAULT: " + def);
+          println("default: " + def);
+          
+        } else {
+          throw new Exception("Choice must be \"y\" or \"n\", user entered: \"" + submission + "\"");
         }
 
         // no condition for "n" because `answer` is false by default
@@ -264,7 +358,7 @@ public class DellaPortaCipher {
    * 
    * @param <File> programLogFile: The output file of the program logs
    * @param <boolean> append: Determines if the logs will append the updated information
-   * or overwrite the existng logs with the new logs. true = append, false = overwrite.
+   * or overwrite the existing logs with the new logs. true = append, false = overwrite.
    */
   public static void updateLogs(File programLogFile, boolean append) 
   {
@@ -287,10 +381,6 @@ public class DellaPortaCipher {
 
   public static void addWarningLog(String message) {
     programLogs.add(WARNING_PREFIX + message);
-  }
-
-  public static void setDebugMode(boolean enabled) {
-    debugMode = enabled;
   }
 
   /*
@@ -521,9 +611,9 @@ public class DellaPortaCipher {
 
     // calculate the compliment character of messageLetter
     if (messageLetter < 'n')
-      encryptedLetter = (char) (('a' + PORTA_MATRIX_SIZE) + ((messageLetter - 'a') + portaRowIndex)%PORTA_MATRIX_SIZE);
+      encryptedLetter = (char) (('a' + 13) + ((messageLetter - 'a') + portaRowIndex)%13);
     else
-      encryptedLetter = (char) ('a' + (PORTA_MATRIX_SIZE - (('z' - messageLetter) + portaRowIndex)%PORTA_MATRIX_SIZE) - 1);
+      encryptedLetter = (char) ('a' + (12 - (('z' - messageLetter) + portaRowIndex)%13));
 
     return encryptedLetter;
   }
@@ -601,6 +691,44 @@ public class DellaPortaCipher {
     // if all else, validate the string
     return true;
   }
+
+  /*
+   * chooseRandomDefaultMessage():
+   * 
+   * Returns a random default message to use
+   */
+  public static String chooseRandomDefaultMessage() {
+    String[] choices = {
+      "The quick brown fox jumped over the lazy dog",
+      "Somewhere over the rainbow",
+      "A long time ago, in a galaxy far far away",
+      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae mollitia, qui iusto voluptatibus provident harum cupiditate ratione debitis natus nobis!",
+      "One small step for man, one giant leap for mankind",
+      "If I have seen further than others, it is by standing on the shoulders of giants",
+      "I see you have opted for a default message. Hello, I am the default message.",
+    };
+
+    return choices[(int) (Math.random()*choices.length)];
+  }
+
+  /*
+   * chooseRandomDefaultKeyword():
+   * 
+   * Returns a random default keyword to use
+   */
+  public static String chooseRandomDefaultKeyword() {
+    String[] choices = {
+      "fox",
+      "cloud",
+      "star",
+      "lorem",
+      "moon",
+      "science",
+      "friend"
+    };
+
+    return choices[(int) (Math.random()*choices.length)];
+  }
  
   public static void main(String[] args) 
   {
@@ -620,7 +748,7 @@ public class DellaPortaCipher {
          * algorithm is running in debug mode
          */
         // Reset debug mode to factory
-        setDebugMode(false);
+        debugMode = false;
 
         // Clear old logs and begin new logs
         programLogs.clear();
@@ -634,8 +762,16 @@ public class DellaPortaCipher {
         programLogs.add("Waiting for user input...");
         updateLogs(programLogFile, true);
 
+        System.out.println("\u001B[30m" + "Hello World in red!");
+        
+        println(buildColoredString(ConsoleColors.TEXT_BG_CYAN, ConsoleColors.TEXT_RED, DEBUG_PREFIX + "Press 'Enter' without typing a value to choose defaults.\n"));
+        println(DEBUG_PREFIX + "For more info on settings, read the 'CONFIG' comment at the top of the source code.\n");
+        println(DEBUG_PREFIX + "To learn more about the Della Porta cipher, visit our webpage: https://will-blog-sigma.vercel.app\n");
+        println("======================================================\n");
+
+
         // prompt for debug mode
-        setDebugMode(promptBoolean(input, "Run in debug mode"));
+        debugMode = promptBoolean(input, "Run in debug mode", false);
 
         /*
          * ONLY IF `debugMode` is TRUE:
@@ -646,7 +782,7 @@ public class DellaPortaCipher {
          *        - if false, then programlogs.txt is appended every program re-run
          */
         if (debugMode) {
-          boolean resetProgramLogs = promptBoolean(input, "Reset program logs");
+          boolean resetProgramLogs = promptBoolean(input, "Reset program logs", true);
 
           writeFile(
             programLogFile, 
@@ -661,17 +797,17 @@ public class DellaPortaCipher {
         println("");
 
         // Prompt for message string
-        String message = promptMessage(input, "Enter message: ");
+        String message = promptMessage(input, "Enter message: ", chooseRandomDefaultMessage());
         programLogs.add("Set message to: \"" + message + "\"");
         updateLogs(programLogFile, true);
 
         // Prompt for keyword string
-        String keyword = promptMessage(input, "Enter keyword: ");
+        String keyword = promptMessage(input, "Enter keyword: ", chooseRandomDefaultKeyword());
         programLogs.add("Set keyword to: \"" + keyword + "\"");
 
         // Update program log
         updateLogs(programLogFile, true);
-        println("\n======================================================\n");
+        println("\n------------------------------------------------------\n");
 
         // Input validation for keyword
         if (!containsExclusivelyLetters(keyword)) {
@@ -692,9 +828,8 @@ public class DellaPortaCipher {
         try {
           if (debugMode) {
             Desktop.getDesktop().open(programLogFile);
+            Desktop.getDesktop().open(outputFile);
           }
-
-          Desktop.getDesktop().open(outputFile);
         } catch (IOException e) {
           error("Could not open output file");
         }
@@ -709,6 +844,7 @@ public class DellaPortaCipher {
           input, 
           "Options:",
           "Choose item number: ",
+          1,
           new String[] {
             "Run Again",
             "Open Program Logs",
