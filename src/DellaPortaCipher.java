@@ -60,6 +60,8 @@ public class DellaPortaCipher {
   final public static String DEBUG_PREFIX = "$text-cyan [ ? ] ";
   final public static String WARNING_PREFIX = "$text-yellow [ * ] ";
 
+  final public static String COLOR_TAG_PATTERN = "\\$([a-zA-Z]+)\\-?([a-zA-Z_]*)";
+
   // Program logs
   final public static ArrayList<String> programLogs = new ArrayList<>();
 
@@ -132,7 +134,10 @@ public class DellaPortaCipher {
   public static String substituteColors(String[][] theme, String source, boolean reset) {
     if (source == null) return "";
 
-    Pattern colorTag = Pattern.compile("\\$([a-zA-Z]+)\\-?([a-zA-Z_]*)");
+    // escape the $ symbol with '/'
+    source = escapeColorTag(source);
+
+    Pattern colorTag = Pattern.compile(COLOR_TAG_PATTERN);
     Matcher matcher = colorTag.matcher(source);
 
     boolean initialMatch = matcher.find();
@@ -210,7 +215,20 @@ public class DellaPortaCipher {
       build += source.substring(lastStart, sourceLen);
 
     // return final build and append reset, so colors don't carry over to the next print
-    return build + (reset ? getColor(TEXT_COLORS, "reset") : "");
+    return unescapeColorTag(build) + (reset ? getColor(TEXT_COLORS, "reset") : "");
+  }
+
+  public static String escapeColorTag(String str) {
+    return str.replaceAll("/\\$", "\0esc");
+  }
+
+  public static String unescapeColorTag(String str) {
+    return str.replaceAll("\0esc", "\\$");
+  }
+
+  public static String replaceColorTags(Object message) {
+    String text = "" + message;
+    return text.replaceAll(COLOR_TAG_PATTERN, "");
   }
 
   /*
@@ -239,7 +257,7 @@ public class DellaPortaCipher {
     if (useConsoleColors)
       System.out.println(substituteColors("" + message));
     else
-      System.out.println(message);
+      System.out.println(replaceColorTags(message));
   }
 
   /*
@@ -251,7 +269,7 @@ public class DellaPortaCipher {
     if (useConsoleColors)
       System.out.print(substituteColors("" + message));
     else 
-      System.out.print(message);
+      System.out.print(replaceColorTags(message));
   }
 
   /*
@@ -263,7 +281,7 @@ public class DellaPortaCipher {
     if (useConsoleColors)
       System.out.printf(substituteColors("" + template), args);
     else
-      System.out.printf(template, args);
+      System.out.printf(replaceColorTags(template), args);
   }
 
   /*
