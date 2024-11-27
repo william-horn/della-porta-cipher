@@ -56,9 +56,9 @@ public class DellaPortaCipher {
   final public static String PROGRAM_LOG_PATH = "/output/programlog.txt";
 
   // Output prefixes
-  final public static String ERROR_PREFIX = "[ ! ] Error: ";
-  final public static String DEBUG_PREFIX = "[ ? ] ";
-  final public static String WARNING_PREFIX = "[ * ] ";
+  final public static String ERROR_PREFIX = "$text-red [ ! ] Error: ";
+  final public static String DEBUG_PREFIX = "$text-cyan [ ? ] ";
+  final public static String WARNING_PREFIX = "$text-yellow [ * ] ";
 
   // Program logs
   final public static ArrayList<String> programLogs = new ArrayList<>();
@@ -67,12 +67,12 @@ public class DellaPortaCipher {
 
   // Togglable
   public static boolean debugMode = false;
-  public static boolean useConsoleColors = false;
+  public static boolean useConsoleColors = true;
 
   // Themes
   final public static String[][] DEFAULT_THEME = {
-    {"error", "bg-black", "text-white"},
-    {"warn", "bg-blue", "text-black"}
+    {"error", "$bg-black", "$text-white"},
+    {"warn", "$bg-blue", "$text-black"}
   };
 
   /*
@@ -121,10 +121,18 @@ public class DellaPortaCipher {
     {"bright_white", "\u001B[107m"}
   };
 
+  public static String substituteColors(String source) {
+    return substituteColors(DEFAULT_THEME, source);
+  }
+
   public static String substituteColors(String[][] theme, String source) {
+    return substituteColors(theme, source, true);
+  }
+
+  public static String substituteColors(String[][] theme, String source, boolean reset) {
     if (source == null) return "";
 
-    Pattern colorTag = Pattern.compile("\\$([a-zA-Z]+)\\-?([a-zA-Z]*)");
+    Pattern colorTag = Pattern.compile("\\$([a-zA-Z]+)\\-?([a-zA-Z_]*)");
     Matcher matcher = colorTag.matcher(source);
 
     boolean initialMatch = matcher.find();
@@ -137,7 +145,7 @@ public class DellaPortaCipher {
       do {
         // find the match start/end index
         int start = matcher.start();
-        int end = matcher.end();
+        int end = matcher.end() + 1;
 
         /*
          * get the different captures
@@ -148,9 +156,6 @@ public class DellaPortaCipher {
          */
         String colorType = matcher.group(1);
         String colorValue = matcher.group(2);
-
-        // the color list based on the color type (capture 1)
-        String[][] colorList;
 
         /*
          * if no capture 2 (ex: $something):
@@ -169,8 +174,8 @@ public class DellaPortaCipher {
           colorType = "theme";
 
           // replace "bg-color" and "bg-text" with their literal console colors, and combine them
-          String bgColor = substituteColors(theme, themeTokenData[1]);
-          String textColor = substituteColors(theme, themeTokenData[2]);
+          String bgColor = substituteColors(theme, themeTokenData[1], false);
+          String textColor = substituteColors(theme, themeTokenData[2], false);
 
           boolean bgExists = !bgColor.equals("");
           boolean textExists = !textColor.equals("");
@@ -187,15 +192,12 @@ public class DellaPortaCipher {
 
         // switch color list based on color type
         switch (colorType) {
-          case "bg": { colorList = BG_COLORS; break; }
-          case "text": { colorList = TEXT_COLORS; break; }
-
-          // todo: add try-catch exception handling for invalid color type case
-          default: colorList = null;
+          case "bg": { colorValue = getColor(BG_COLORS, colorValue); break; }
+          case "text": { colorValue = getColor(TEXT_COLORS, colorValue); break; }
         }
 
         // append the string leading up to the match, plus the replaced match value
-        build += source.substring(lastStart, start) + getColor(colorList, colorValue);
+        build += source.substring(lastStart, start) + colorValue;
 
         // update the next starting index
         lastStart = end;
@@ -208,7 +210,7 @@ public class DellaPortaCipher {
       build += source.substring(lastStart, sourceLen);
 
     // return final build and append reset, so colors don't carry over to the next print
-    return build + getColor(TEXT_COLORS, "reset");
+    return build + (reset ? getColor(TEXT_COLORS, "reset") : "");
   }
 
   /*
@@ -234,7 +236,10 @@ public class DellaPortaCipher {
    * Shorthand for: System.out.println(...);
    */
   public static void println(Object message) {
-    System.out.println(message);
+    if (useConsoleColors)
+      System.out.println(substituteColors("" + message));
+    else
+      System.out.println(message);
   }
 
   /*
@@ -243,7 +248,10 @@ public class DellaPortaCipher {
    * Shorthand for: System.out.print(...);
    */
   public static void print(Object message) {
-    System.out.print(message);
+    if (useConsoleColors)
+      System.out.print(substituteColors("" + message));
+    else 
+      System.out.print(message);
   }
 
   /*
@@ -252,7 +260,10 @@ public class DellaPortaCipher {
    * Shorthand for: System.out.printf(...);
    */
   public static void printf(String template, Object ...args) {
-    System.out.printf(template, args);
+    if (useConsoleColors)
+      System.out.printf(substituteColors("" + template), args);
+    else
+      System.out.printf(template, args);
   }
 
   /*
@@ -283,12 +294,12 @@ public class DellaPortaCipher {
    * @param <String> message: The message to display before requesting the input
    */
   public static String promptMessage(Scanner input, String message, String def) {
-    print("> " + message);
+    print("> $text-green " + message);
     String submission = input.nextLine();
 
     // Handle default case
     if (submission.equals("")) {
-      print("default: " + def + "\n\n");
+      print("$text-purple default: $text-reset " + def + "\n\n");
       return def;
     }
 
@@ -313,13 +324,13 @@ public class DellaPortaCipher {
     println("");
 
     // display the menu title
-    println("-".repeat(padding));
-    printf("| %s |\n", title);
-    println("-".repeat(padding) + "\n");
+    println("$text-blue -".repeat(padding));
+    printf("$text-blue | $text-white %s$text-blue  |\n", title);
+    println("$text-blue -".repeat(padding) + "\n");
 
     // display the menu options
     for (int i = 1; i <= choices.length; i++)
-      printf("%s) %s\n", i, choices[i - 1]);
+      printf("$text-yellow %s)$text-reset  %s\n", i, choices[i - 1]);
 
     // collect user input
     println("");
@@ -334,7 +345,7 @@ public class DellaPortaCipher {
     int itemNumber = 0; do 
     {
       // display the prompt message
-      print("> " + promptMessage);
+      print("> $text-green " + promptMessage);
       String menuChoice = input.nextLine();
       
       // Handle the default case
@@ -383,7 +394,7 @@ public class DellaPortaCipher {
     boolean answer = def; do
     {
       // prompt input
-      print("> " + message + " (y/n/Enter): ");
+      print("> $text-green " + message + " (y/n/Enter): ");
       String submission = input.nextLine();
 
       try 
@@ -397,7 +408,7 @@ public class DellaPortaCipher {
 
         } else if (submission.equals("")) {
           programLogs.add("Choosing DEFAULT: " + def);
-          println("default: " + def);
+          println("$text-purple default: $text-reset " + def);
           
         } else {
           throw new Exception("Choice must be \"y\" or \"n\", user entered: \"" + submission + "\"");
@@ -855,10 +866,6 @@ public class DellaPortaCipher {
     File programLogFile = new File(getPath(PROGRAM_LOG_PATH));
     File outputDir = new File(getPath(OUTPUT_DIR));
 
-    println(substituteColors(DEFAULT_THEME, "hello $text-red nice $text-blue day in the $text-red town"));
-    println(substituteColors(DEFAULT_THEME, "testing $error theme"));
-    println(substituteColors(DEFAULT_THEME, "testing $error theme and $warn merging themes"));
-
     // Locate or create output folder directory
     if (!outputDir.exists()) {
       outputDir.mkdir();
@@ -867,7 +874,7 @@ public class DellaPortaCipher {
     // Set global command-line settings
     switch (args.length) {
       case 1: {
-        useConsoleColors = args[0] == "colors";
+        useConsoleColors = args[0].equals("colors");
       }
     }
 
@@ -897,14 +904,14 @@ public class DellaPortaCipher {
         establishFile(programLogFile, false);
 
         // User input parameters
-        println("\n======= DELLA PORTA CIPHER ===========================\n");
+        println("\n$text-blue ======= $text-white DELLA PORTA CIPHER $text-blue ===========================$text-reset \n");
         programLogs.add("Waiting for user input...");
         updateLogs(programLogFile, true);
 
-        println("Press 'Enter' without typing a value to choose defaults.\n");
+        println(WARNING_PREFIX + "Press 'Enter' without typing a value to choose defaults.\n");
         println(DEBUG_PREFIX + "For more info on settings, read the 'CONFIG' comment at the top of the source code.\n");
         println(DEBUG_PREFIX + "To learn more about the Della Porta cipher, visit our webpage: https://will-blog-sigma.vercel.app\n");
-        println("======================================================\n");
+        println("$text-blue ======================================================$text-reset \n");
 
 
         // prompt for debug mode
@@ -944,7 +951,7 @@ public class DellaPortaCipher {
 
         // Update program log
         updateLogs(programLogFile, true);
-        println("\n------------------------------------------------------\n");
+        println("\n$text-blue ------------------------------------------------------$text-reset \n");
 
         // Input validation for keyword
         if (!containsExclusivelyLetters(keyword)) {
@@ -956,7 +963,7 @@ public class DellaPortaCipher {
 
         // Generate the output text
         String output = convertPortaCipher(message, keyword).toUpperCase();
-        println("=> Output: " + output);
+        println("$text-yellow => Output: $text-reset " + output);
 
         // Write to output file
         writeFile(outputFile, output, false);
