@@ -9,31 +9,40 @@
  * ============
  * 
  * This application takes text input from the user to encrypt
- * or decrypt according to the Della Porta Cipher. It has several
+ * or decrypt according to the Della Porta cipher. It has several
  * debug options, and output can be read through the terminal
- * or through the output text files.
+ * or through the output text files found in the directory of the
+ * application.
  * 
- * NOTE: if running on system earlier than windows 11, notepad windows
- * may need to be manually navigated to in order to view the output. They 
- * may also need to be manually closed before re-running the program, to
- * avoid having several notepad windows at the same time.
+ * NOTE: 
+ *    if running on Windows on a system earlier than Windows 11, notepad
+ *    may need to be manually navigated to in order to view the output. They 
+ *    may also need to be manually closed before re-running the program, to
+ *    avoid having several notepad windows at the same time. This is only
+ *    a concern if running the program in debug mode.
  * 
  * ==============
  * --- CONFIG --- 
  * ==============
  * 
  * Program Variables:
- *  - PORTA_MATRIX_SIZE
+ *    - PORTA_MATRIX_SIZE
  */
 
- // import classes/libraries
+ // File IO
 import java.awt.Desktop;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+// General util
 import java.util.ArrayList;
 import java.util.Scanner;
+
+// Regex
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DellaPortaCipher {
   /*
@@ -46,6 +55,7 @@ public class DellaPortaCipher {
   final public static int PROGRAM_LOG_MAX_PAIRS = 15;
 
   // File I/O
+  final public static String OUTPUT_DIR = "/output";
   final public static String OUTPUT_PATH = "/output/output.txt";
   final public static String PROGRAM_LOG_PATH = "/output/programlog.txt";
 
@@ -61,61 +71,130 @@ public class DellaPortaCipher {
 
   // Togglable
   public static boolean debugMode = false;
+  public static boolean useConsoleColors = false;
+
+  // Themes
+  final public static String[][] DEFAULT_THEME = {
+    {"error", "bg-black", "text-white"}
+  };
 
   /*
    * Console colors
    * Source: https://nonvalet.com/posts/20210413_java_console_colors/#:~:text=To%20change%20terminal%20colors%2C%20you,names%20for%20better%20code%20readability.
    */
+  final public static String[][] TEXT_COLORS = {
+    {"reset", "\u001B[0m"},
 
-  public static class ConsoleColors 
-  {
-    public static final String TEXT_RESET  = "\u001B[0m";
+    {"black", "\u001B[30m"},
+    {"red", "\u001B[31m"},
+    {"green", "\u001B[32m"},
+    {"yellow", "\u001B[33m"},
+    {"blue", "\u001B[34m"},
+    {"purple", "\u001B[35m"},
+    {"cyan", "\u001B[36m"},
+    {"white", "\u001B[37m"},
 
-    public static final String TEXT_BLACK  = "\u001B[30m";
-    public static final String TEXT_RED    = "\u001B[31m";
-    public static final String TEXT_GREEN  = "\u001B[32m";
-    public static final String TEXT_YELLOW = "\u001B[33m";
-    public static final String TEXT_BLUE   = "\u001B[34m";
-    public static final String TEXT_PURPLE = "\u001B[35m";
-    public static final String TEXT_CYAN   = "\u001B[36m";
-    public static final String TEXT_WHITE  = "\u001B[37m";
+    {"bright_black", "\u001B[90m"},
+    {"bright_red", "\u001B[91m"},
+    {"bright_green", "\u001B[92m"},
+    {"bright_yellow", "\u001B[93m"},
+    {"bright_blue", "\u001B[94m"},
+    {"bright_purple", "\u001B[95m"},
+    {"bright_cyan", "\u001B[96m"},
+    {"bright_white", "\u001B[97m"},
+  };
 
-    public static final String TEXT_BRIGHT_BLACK  = "\u001B[90m";
-    public static final String TEXT_BRIGHT_RED    = "\u001B[91m";
-    public static final String TEXT_BRIGHT_GREEN  = "\u001B[92m";
-    public static final String TEXT_BRIGHT_YELLOW = "\u001B[93m";
-    public static final String TEXT_BRIGHT_BLUE   = "\u001B[94m";
-    public static final String TEXT_BRIGHT_PURPLE = "\u001B[95m";
-    public static final String TEXT_BRIGHT_CYAN   = "\u001B[96m";
-    public static final String TEXT_BRIGHT_WHITE  = "\u001B[97m";
+  final public static String[][] BG_COLORS = {
+    {"black", "\u001B[40m"},
+    {"red", "\u001B[41m"},
+    {"green", "\u001B[42m"},
+    {"yellow", "\u001B[43m"},
+    {"blue", "\u001B[44m"},
+    {"purple", "\u001B[45m"},
+    {"cyan", "\u001B[46m"},
+    {"white", "\u001B[47m"},
 
-    public static final String TEXT_BG_BLACK  = "\u001B[40m";
-    public static final String TEXT_BG_RED    = "\u001B[41m";
-    public static final String TEXT_BG_GREEN  = "\u001B[42m";
-    public static final String TEXT_BG_YELLOW = "\u001B[43m";
-    public static final String TEXT_BG_BLUE   = "\u001B[44m";
-    public static final String TEXT_BG_PURPLE = "\u001B[45m";
-    public static final String TEXT_BG_CYAN   = "\u001B[46m";
-    public static final String TEXT_BG_WHITE  = "\u001B[47m";
+    {"bright_black", "\u001B[100m"},
+    {"bright_red", "\u001B[101m"},
+    {"bright_green", "\u001B[102m"},
+    {"bright_yellow", "\u001B[103m"},
+    {"bright_blue", "\u001B[104m"},
+    {"bright_purple", "\u001B[105m"},
+    {"bright_cyan", "\u001B[106m"},
+    {"bright_white", "\u001B[107m"}
+  };
 
-    public static final String TEXT_BRIGHT_BG_BLACK  = "\u001B[100m";
-    public static final String TEXT_BRIGHT_BG_RED    = "\u001B[101m";
-    public static final String TEXT_BRIGHT_BG_GREEN  = "\u001B[102m";
-    public static final String TEXT_BRIGHT_BG_YELLOW = "\u001B[103m";
-    public static final String TEXT_BRIGHT_BG_BLUE   = "\u001B[104m";
-    public static final String TEXT_BRIGHT_BG_PURPLE = "\u001B[105m";
-    public static final String TEXT_BRIGHT_BG_CYAN   = "\u001B[106m";
-    public static final String TEXT_BRIGHT_BG_WHITE  = "\u001B[107m";
-  }
+  public static String substituteColors(String[][] theme, String source) {
+    Pattern colorTag = Pattern.compile("\\$([a-zA-Z]+)\\-?([a-zA-Z]*)");
+    Matcher matcher = colorTag.matcher(source);
 
-  public static String buildColoredString(String bgColor, String textColor, String str)
-  {
-    String toReturn = "";
+    boolean initialMatch = matcher.find();
+    int sourceLen = source.length();
+    int lastStart = 0;
 
-    toReturn += bgColor;
-    toReturn += textColor;
+    String build = "";
+    
+    if (initialMatch) {
+      do {
+        // find the match start/end index
+        int start = matcher.start();
+        int end = matcher.end();
 
-    return toReturn + str + ConsoleColors.TEXT_RESET;
+        /*
+         * get the different captures
+         * 
+         * ex: $bg-black
+         *    capture 1: "bg"
+         *    capture 2: "black"
+         */
+        String colorType = matcher.group(1);
+        String colorValue = matcher.group(2);
+
+        // the color list based on the color type (capture 1)
+        String[][] colorList;
+
+        /*
+         * if no capture 2 (ex: $something):
+         *    - capture 1 is treated as a lookup key in `theme`
+         * 
+         *    - if found, then return the data associated with the key
+         *        * data in form: { "key", "bg-color", "text-color" }
+         * 
+         *    - recursively call method for "bg-color" and "text-color" to retrieve
+         *      their values.
+         */
+        if (colorValue.equals("")) {
+          // get theme data in form: { "key", "bg-color", "text-color" }
+          String[] themeTokenData = getThemeToken(theme, colorType);
+
+          // replace "bg-color" and "bg-text" with their literal console colors
+          colorType = substituteColors(theme, themeTokenData[1]);
+          colorValue = substituteColors(theme, themeTokenData[2]);
+        }
+
+        // switch color list based on color type
+        switch (colorType) {
+          case "bg": { colorList = BG_COLORS; break; }
+          case "text": { colorList = TEXT_COLORS; break; }
+
+          // todo: add try-catch exception handling for invalid color type case
+          default: colorList = new String[0][];
+        }
+
+        // append the string leading up to the match, plus the replaced match value
+        build += source.substring(lastStart, start) + getColor(colorList, colorValue);
+
+        // update the next starting index
+        lastStart = end;
+
+      } while (matcher.find());
+    }
+
+    // final case, if there is any remaining part of the string after the last match
+    if (lastStart < sourceLen)
+      build += source.substring(lastStart, sourceLen);
+
+    return build;
   }
 
   /*
@@ -123,11 +202,17 @@ public class DellaPortaCipher {
    * | Enums |
    * ---------
    */
-   public static enum InputValidation 
-   {
+  public static enum InputValidation 
+  {
     VALID,
     INVALID
-   }
+  }
+
+  /*
+   * =======================================
+   * | ---------- PRINT METHODS ---------- |
+   * =======================================
+   */
 
   /*
    * println(<Object> message):
@@ -168,28 +253,11 @@ public class DellaPortaCipher {
     println(ERROR_PREFIX + message);
   }
 
-  // conditional println() when debug mode is enabled
-  public static void debug__println(Object message) {
-    if (debugMode) println(DEBUG_PREFIX + message);
-  }
-
-  // conditional print() when debug mode is enabled
-  public static void debug__print(Object message) {
-    if (debugMode) print("\n" + DEBUG_PREFIX + message);
-  }
-
-  // conditional printf() when debug mode is enabled
-  public static void debug__printf(String template, Object ...args) 
-  {
-    if (debugMode) {
-      printf("\n" + DEBUG_PREFIX + template, args);
-    }
-  }
-
-  // conditional error() when debug mode is enabled
-  public static void debug__error(String message) {
-    if (debugMode) error(message);
-  }
+  /*
+   * ========================================
+   * | ---------- PROMPT METHODS ---------- |
+   * ========================================
+   */
 
   /*
    * promptMessage(<Scanner> input, <String> message):
@@ -348,40 +416,12 @@ public class DellaPortaCipher {
     return dir + path;
   }
 
+
   /*
-   * updateLogs(<File> programLogFile, <boolean> append):
-   * 
-   * Updates a given file for storing program logs with the global
-   * programLogs array list entries. This method only writes to a file
-   * if `debugMode` is true. Once the file is written to, the global
-   * `programLogs` array list will be cleared.
-   * 
-   * @param <File> programLogFile: The output file of the program logs
-   * @param <boolean> append: Determines if the logs will append the updated information
-   * or overwrite the existing logs with the new logs. true = append, false = overwrite.
+   * ======================================
+   * | ---------- FILE METHODS ---------- |
+   * ======================================
    */
-  public static void updateLogs(File programLogFile, boolean append) 
-  {
-    // ignore this method when not in debugMode
-    if (!debugMode) return;
-
-    // all of the current programLogs concatenated together
-    String text = "";
-
-    for (String log : programLogs)
-      text += log + "\n";
-
-    writeFile(programLogFile, text, append);
-    programLogs.clear();
-  }
-
-  public static void addErrorLog(String message) {
-    programLogs.add(ERROR_PREFIX + message);
-  }
-
-  public static void addWarningLog(String message) {
-    programLogs.add(WARNING_PREFIX + message);
-  }
 
   /*
    * establishFile(<File> file, <boolean> required):
@@ -413,8 +453,6 @@ public class DellaPortaCipher {
       if (required && !file.exists()) 
       {
         log = "Required file '%s' does not exist (creating blank txt file)";
-
-        debug__printf(log + "\n", file.getName());
         programLogs.add(log.replaceAll("%s", file.getName()));
 
         file.createNewFile();
@@ -428,8 +466,6 @@ public class DellaPortaCipher {
       if (fileCreated) 
       {
         log = "New file created: %s";
-
-        debug__printf(log + "\n", file.getName());
         programLogs.add(log.replaceAll("%s", file.getName()));
 
         return true;
@@ -437,21 +473,28 @@ public class DellaPortaCipher {
 
       // if file was not created, announce that it already exists
       log = "File '%s' already exists";
-
-      debug__printf(log + "\n", file.getName());
       programLogs.add(log.replaceAll("%s", file.getName()));
 
       return false;
 
     } catch(IOException e) 
     {
-      debug__error(e.getMessage());
       addErrorLog("Issue establishing file: " + e.getMessage());
-
       return false;
     }
   }
 
+  /*
+   * writeFile(<File> file, <String> text, <boolean> append):
+   * 
+   * Write text to a file
+   * 
+   * @param <File> file: The File object to write to
+   * @param <String> text: The text to write
+   * @param <boolean> append: 
+   *    Whether to append the text or overwrite the 
+   *    pre-existing text (true = append, false = overwrite)
+   */
   public static void writeFile(File file, String text, boolean append) 
   {
     // write the new modified input source to the output file
@@ -468,13 +511,19 @@ public class DellaPortaCipher {
 
       } catch (IOException e) {
         addErrorLog("Issue writing to file: " + e.getMessage());
-        debug__error(e.getMessage());
       }
     } catch (IOException e) {
       addErrorLog("Issue creating FileWriter: " + e.getMessage());
-      debug__error(e.getMessage());
     }
   }
+
+
+  /*
+   * ===========================================
+   * | ---------- ALGORITHM METHODS ---------- |
+   * ===========================================
+   */
+
 
   /*
    * getKeywordMessagePairs(<String> keyword, <String> message):
@@ -663,6 +712,61 @@ public class DellaPortaCipher {
   }
 
   /*
+   * ================================================
+   * | ---------- MISC. UTILITY  METHODS ---------- |
+   * ================================================
+   */
+
+   public static String getColor(String[][] colorList, String name) {
+    for (String[] colorData : colorList)
+      if (name.equals(colorData[0])) return colorData[1];
+
+    return null;
+  }
+
+  public static String[] getThemeToken(String[][] theme, String token) {
+    for (String[] themeData : theme)
+      if (token.equals(themeData[0])) return themeData;
+
+    return new String[0];
+  }
+
+  /*
+   * updateLogs(<File> programLogFile, <boolean> append):
+   * 
+   * Updates a given file for storing program logs with the global
+   * programLogs array list entries. This method only writes to a file
+   * if `debugMode` is true. Once the file is written to, the global
+   * `programLogs` array list will be cleared.
+   * 
+   * @param <File> programLogFile: The output file of the program logs
+   * @param <boolean> append: Determines if the logs will append the updated information
+   * or overwrite the existing logs with the new logs. true = append, false = overwrite.
+   */
+  public static void updateLogs(File programLogFile, boolean append) 
+  {
+    // ignore this method when not in debugMode
+    if (!debugMode) return;
+
+    // all of the current programLogs concatenated together
+    String text = "";
+
+    for (String log : programLogs)
+      text += log + "\n";
+
+    writeFile(programLogFile, text, append);
+    programLogs.clear();
+  }
+
+  public static void addErrorLog(String message) {
+    programLogs.add(ERROR_PREFIX + message);
+  }
+
+  public static void addWarningLog(String message) {
+    programLogs.add(WARNING_PREFIX + message);
+  }
+
+  /*
    * containsExclusivelyLetters(<String> text):
    * 
    * Validates whether or not a given string contains
@@ -735,7 +839,25 @@ public class DellaPortaCipher {
     // Locate output files
     File outputFile = new File(getPath(OUTPUT_PATH));
     File programLogFile = new File(getPath(PROGRAM_LOG_PATH));
+    File outputDir = new File(getPath(OUTPUT_DIR));
 
+    println(substituteColors(DEFAULT_THEME, "hello $text-red nice $text-blue day in the $text-red town"));
+
+    // Locate or create output folder directory
+    if (!outputDir.exists()) {
+      outputDir.mkdir();
+    }
+
+    // Set global command-line settings
+    switch (args.length) {
+      case 1: {
+        useConsoleColors = args[0] == "colors";
+      }
+    }
+
+    /*
+     * USER INPUT INTERFACE
+     */
     try (Scanner input = new Scanner(System.in)) 
     {
       main: while (true) 
@@ -762,9 +884,7 @@ public class DellaPortaCipher {
         programLogs.add("Waiting for user input...");
         updateLogs(programLogFile, true);
 
-        System.out.println("\u001B[30m" + "Hello World in red!");
-        
-        println(buildColoredString(ConsoleColors.TEXT_BG_CYAN, ConsoleColors.TEXT_RED, DEBUG_PREFIX + "Press 'Enter' without typing a value to choose defaults.\n"));
+        println("Press 'Enter' without typing a value to choose defaults.\n");
         println(DEBUG_PREFIX + "For more info on settings, read the 'CONFIG' comment at the top of the source code.\n");
         println(DEBUG_PREFIX + "To learn more about the Della Porta cipher, visit our webpage: https://will-blog-sigma.vercel.app\n");
         println("======================================================\n");

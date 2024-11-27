@@ -4,48 +4,47 @@
 File 'output.txt' already exists
 File 'programlog.txt' already exists
 Waiting for user input...
-Choosing DEFAULT: true
 Set debug mode to: true
-Set message to: "The quick brown fox jumped over the lazy dog"
+Set message to: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae mollitia, qui iusto voluptatibus provident harum cupiditate ratione debitis natus nobis!"
 Set keyword to: "lorem"
 Preparing to convert message...
 Preparing to create keyword/message pairs array...
 
-{ t, l }
-{ h, o }
-{ e, r }
+{ l, l }
+{ o, o }
+{ r, r }
+{ e, e }
+{ m, m }
 {  ,   }
-{ q, e }
-{ u, m }
 { i, l }
-{ c, o }
-{ k, r }
+{ p, o }
+{ s, r }
+{ u, e }
+{ m, m }
 {  ,   }
-{ b, e }
-{ r, m }
-{ o, l }
-{ w, o }
-{ n, r }
-...29
+{ d, l }
+{ o, o }
+{ l, r }
+...142
 
 Preparing to iterate over keywordMessagePairs to find letter compliments...
 
-t -> b
-h -> o
-e -> z
+l -> q
+o -> h
+r -> j
+e -> t
+m -> s
   ->  
-q -> b
-u -> b
 i -> n
-c -> w
-k -> s
+p -> i
+s -> k
+u -> f
+m -> s
   ->  
-b -> q
-r -> l
-o -> j
-w -> c
-n -> f
-...29
+d -> v
+o -> h
+l -> t
+...142
 
 END
 
