@@ -736,10 +736,13 @@ public class DellaPortaCipher {
     File outputFile = new File(getPath(OUTPUT_PATH));
     File programLogFile = new File(getPath(PROGRAM_LOG_PATH));
 
+    System.out.println(ConsoleColors.TEXT_BLUE + "hello " + ConsoleColors.TEXT_RED + " WORLD");
+
     try (Scanner input = new Scanner(System.in)) 
     {
       main: while (true) 
       {
+        
         /*
          * FILE WRITING:
          * 

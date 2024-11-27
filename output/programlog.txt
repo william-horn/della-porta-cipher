@@ -50,3 +50,105 @@ n -> f
 END
 
 For more info, visit: https://will-blog-sigma.vercel.app/
+
+----- START ----------------------------
+
+File 'output.txt' already exists
+File 'programlog.txt' already exists
+Waiting for user input...
+Set debug mode to: true
+Set message to: "I see you have opted for a default message. Hello, I am the default message."
+Set keyword to: "fox"
+Preparing to convert message...
+Preparing to create keyword/message pairs array...
+
+{ i, f }
+{  ,   }
+{ s, o }
+{ e, x }
+{ e, f }
+{  ,   }
+{ y, o }
+{ o, x }
+{ u, f }
+{  ,   }
+{ h, o }
+{ a, x }
+{ v, f }
+{ e, o }
+{  ,   }
+...61
+
+Preparing to iterate over keywordMessagePairs to find letter compliments...
+
+i -> x
+  ->  
+s -> l
+e -> p
+e -> t
+  ->  
+y -> e
+o -> d
+u -> f
+  ->  
+h -> o
+a -> y
+v -> g
+e -> y
+  ->  
+...61
+
+END
+
+For more info, visit: https://will-blog-sigma.vercel.app/
+
+----- START ----------------------------
+
+File 'output.txt' already exists
+File 'programlog.txt' already exists
+Waiting for user input...
+Set debug mode to: true
+Set message to: "A long time ago, in a galaxy far far away"
+Set keyword to: "cloud"
+Preparing to convert message...
+Preparing to create keyword/message pairs array...
+
+{ a, c }
+{  ,   }
+{ l, l }
+{ o, o }
+{ n, u }
+{ g, d }
+{  ,   }
+{ t, c }
+{ i, l }
+{ m, o }
+{ e, u }
+{  ,   }
+{ a, d }
+{ g, c }
+{ o, l }
+...26
+
+Preparing to iterate over keywordMessagePairs to find letter compliments...
+
+a -> o
+  ->  
+l -> q
+o -> h
+n -> d
+g -> u
+  ->  
+t -> f
+i -> n
+m -> t
+e -> o
+  ->  
+a -> o
+g -> u
+o -> j
+...26
+
+END
+
+For more info, visit: https://will-blog-sigma.vercel.app/
