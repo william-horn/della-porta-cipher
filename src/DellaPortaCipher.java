@@ -75,7 +75,8 @@ public class DellaPortaCipher {
 
   // Themes
   final public static String[][] DEFAULT_THEME = {
-    {"error", "bg-black", "text-white"}
+    {"error", "bg-black", "text-white"},
+    {"warn", "bg-blue", "text-black"}
   };
 
   /*
@@ -125,6 +126,8 @@ public class DellaPortaCipher {
   };
 
   public static String substituteColors(String[][] theme, String source) {
+    if (source == null) return "";
+
     Pattern colorTag = Pattern.compile("\\$([a-zA-Z]+)\\-?([a-zA-Z]*)");
     Matcher matcher = colorTag.matcher(source);
 
@@ -167,9 +170,23 @@ public class DellaPortaCipher {
           // get theme data in form: { "key", "bg-color", "text-color" }
           String[] themeTokenData = getThemeToken(theme, colorType);
 
-          // replace "bg-color" and "bg-text" with their literal console colors
-          colorType = substituteColors(theme, themeTokenData[1]);
-          colorValue = substituteColors(theme, themeTokenData[2]);
+          colorType = "theme";
+
+          // replace "bg-color" and "bg-text" with their literal console colors, and combine them
+          String bgColor = substituteColors(theme, themeTokenData[1]);
+          String textColor = substituteColors(theme, themeTokenData[2]);
+
+          boolean bgExists = !bgColor.equals("");
+          boolean textExists = !textColor.equals("");
+
+          colorValue = bgColor;
+
+          if (bgExists && textExists) {
+            colorValue += textColor;
+
+          } else if (textExists) {
+            colorValue = textColor;
+          }
         }
 
         // switch color list based on color type
@@ -178,7 +195,7 @@ public class DellaPortaCipher {
           case "text": { colorList = TEXT_COLORS; break; }
 
           // todo: add try-catch exception handling for invalid color type case
-          default: colorList = new String[0][];
+          default: colorList = null;
         }
 
         // append the string leading up to the match, plus the replaced match value
@@ -194,7 +211,8 @@ public class DellaPortaCipher {
     if (lastStart < sourceLen)
       build += source.substring(lastStart, sourceLen);
 
-    return build;
+    // return final build and append reset, so colors don't carry over to the next print
+    return build + getColor(TEXT_COLORS, "reset");
   }
 
   /*
@@ -721,14 +739,14 @@ public class DellaPortaCipher {
     for (String[] colorData : colorList)
       if (name.equals(colorData[0])) return colorData[1];
 
-    return null;
+    return "[color not found]";
   }
 
   public static String[] getThemeToken(String[][] theme, String token) {
     for (String[] themeData : theme)
       if (token.equals(themeData[0])) return themeData;
 
-    return new String[0];
+    return new String[] {"null", "", ""};
   }
 
   /*
@@ -842,6 +860,8 @@ public class DellaPortaCipher {
     File outputDir = new File(getPath(OUTPUT_DIR));
 
     println(substituteColors(DEFAULT_THEME, "hello $text-red nice $text-blue day in the $text-red town"));
+    println(substituteColors(DEFAULT_THEME, "testing $error theme"));
+    println(substituteColors(DEFAULT_THEME, "testing $error theme and $warn merging themes"));
 
     // Locate or create output folder directory
     if (!outputDir.exists()) {
