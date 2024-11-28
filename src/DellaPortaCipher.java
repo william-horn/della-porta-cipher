@@ -85,7 +85,8 @@ public class DellaPortaCipher {
   final public static String WARNING_PREFIX = "$text-yellow [ * ] ";
 
   // Themes
-  final public static String[][] DEFAULT_THEME = {
+  final public static String[][] DEFAULT_THEME = 
+  {
     {"error", "$bg-black", "$text-white"},
     {"warn", "$bg-blue", "$text-black"}
   };
@@ -110,7 +111,8 @@ public class DellaPortaCipher {
    * Console colors
    * Source: https://nonvalet.com/posts/20210413_java_console_colors/#:~:text=To%20change%20terminal%20colors%2C%20you,names%20for%20better%20code%20readability.
    */
-  final public static String[][] TEXT_COLORS = {
+  final public static String[][] TEXT_COLORS = 
+  {
     {"reset", "\u001B[0m"},
 
     {"black", "\u001B[30m"},
@@ -132,7 +134,8 @@ public class DellaPortaCipher {
     {"bright_white", "\u001B[97m"},
   };
 
-  final public static String[][] BG_COLORS = {
+  final public static String[][] BG_COLORS = 
+  {
     {"black", "\u001B[40m"},
     {"red", "\u001B[41m"},
     {"green", "\u001B[42m"},
@@ -194,7 +197,8 @@ public class DellaPortaCipher {
    * string.
    * 
    */
-  public static String substituteColors(String[][] theme, String source, boolean reset) {
+  public static String substituteColors(String[][] theme, String source, boolean reset) 
+  {
     if (source == null) return "";
 
     // escape the $ symbol with '/'
@@ -235,7 +239,8 @@ public class DellaPortaCipher {
          *    - recursively call method for "bg-color" and "text-color" to retrieve
          *      their values.
          */
-        if (colorValue.equals("")) {
+        if (colorValue.equals("")) 
+        {
           // get theme data in form: { "key", "bg-color", "text-color" }
           String[] themeTokenData = getThemeToken(theme, colorType);
 
@@ -335,7 +340,8 @@ public class DellaPortaCipher {
    * 
    * Shorthand for: System.out.println(...);
    */
-  public static void println(Object message) {
+  public static void println(Object message) 
+  {
     if (useConsoleColors)
       System.out.println(substituteColors("" + message));
     else
@@ -347,7 +353,8 @@ public class DellaPortaCipher {
    * 
    * Shorthand for: System.out.print(...);
    */
-  public static void print(Object message) {
+  public static void print(Object message) 
+  {
     if (useConsoleColors)
       System.out.print(substituteColors("" + message));
     else 
@@ -359,7 +366,8 @@ public class DellaPortaCipher {
    * 
    * Shorthand for: System.out.printf(...);
    */
-  public static void printf(String template, Object ...args) {
+  public static void printf(String template, Object ...args) 
+  {
     if (useConsoleColors)
       System.out.printf(substituteColors("" + template), args);
     else
@@ -393,7 +401,8 @@ public class DellaPortaCipher {
    * @param <Scanner> input: The scanner object to prompt the user input
    * @param <String> message: The message to display before requesting the input
    */
-  public static String promptMessage(Scanner input, String message, String def) {
+  public static String promptMessage(Scanner input, String message, String def) 
+  {
     print("> $text-green " + message);
     String submission = input.nextLine();
 
@@ -542,7 +551,8 @@ public class DellaPortaCipher {
    * Locate the main program output directory. If one doesn't
    * exist, then create a new one and return it.
    */
-  public static File getOutputDir() {
+  public static File getOutputDir() 
+  {
     File outputDir = new File(OUTPUT_DIR);
     // Locate or create output folder directory
     if (!outputDir.exists()) {
@@ -725,7 +735,8 @@ public class DellaPortaCipher {
     }
 
     // For loop that pairs the characters of the keywordString and the message into an array
-    for (int i = 0; i < keywordPairs.length; i++){
+    for (int i = 0; i < keywordPairs.length; i++)
+    {
       // Copies each letter of the message string along the first column
       keywordPairs[i][0] = message.charAt(i);
       // Copies each letter of the keyword string string along the second column
@@ -857,7 +868,8 @@ public class DellaPortaCipher {
    * Returns an ASCII console color from a given
    * color list
    */
-  public static String getColor(String[][] colorList, String name) {
+  public static String getColor(String[][] colorList, String name) 
+  {
     for (String[] colorData : colorList)
       if (name.equals(colorData[0])) return colorData[1];
 
@@ -870,7 +882,8 @@ public class DellaPortaCipher {
    * Returns a given theme token from a selected
    * theme array
    */
-  public static String[] getThemeToken(String[][] theme, String token) {
+  public static String[] getThemeToken(String[][] theme, String token) 
+  {
     for (String[] themeData : theme)
       if (token.equals(themeData[0])) return themeData;
 
@@ -930,7 +943,8 @@ public class DellaPortaCipher {
     }
 
     // if the string contains non-alphabet characters, invalidate the string
-    for (int i = 0; i < text.length(); i++) {
+    for (int i = 0; i < text.length(); i++) 
+    {
       char letter = text.charAt(i);
       if (!Character.isLetter(letter)) {
         addErrorLog("Found non-alphabet character in text: '" + letter + "'");
@@ -947,7 +961,8 @@ public class DellaPortaCipher {
    * 
    * Returns a random default message to use
    */
-  public static String chooseRandomDefaultMessage() {
+  public static String chooseRandomDefaultMessage() 
+  {
     String[] choices = {
       "The quick brown fox jumped over the lazy dog",
       "Somewhere over the rainbow",
@@ -966,7 +981,8 @@ public class DellaPortaCipher {
    * 
    * Returns a random default keyword to use
    */
-  public static String chooseRandomDefaultKeyword() {
+  public static String chooseRandomDefaultKeyword() 
+  {
     String[] choices = {
       "fox",
       "cloud",
@@ -1031,7 +1047,8 @@ public class DellaPortaCipher {
          *        - if true, then programlogs.txt resets every program re-run 
          *        - if false, then programlogs.txt is appended every program re-run
          */
-        if (debugMode) {
+        if (debugMode) 
+        {
           boolean resetProgramLogs = promptBoolean(input, "Reset program logs", true);
 
           writeFile(
@@ -1103,7 +1120,8 @@ public class DellaPortaCipher {
         );
 
         // if the user choose to exit the program
-        switch (menuItem) {
+        switch (menuItem) 
+        {
           case 2: {
             try { 
               Desktop.getDesktop().open(programLogFile); 
