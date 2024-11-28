@@ -90,7 +90,7 @@ public class DellaPortaCipher {
     {"warn", "$bg-blue", "$text-black"}
   };
 
-    /*
+  /*
    * -----------------------
    * | States & Variables: |
    * -----------------------
@@ -166,10 +166,10 @@ public class DellaPortaCipher {
   }
 
   /*
-  * ================================================
-  * | ---------- STRING & REGEX METHODS ---------- |
-  * ================================================
-  */
+   * ================================================
+   * | ---------- STRING & REGEX METHODS ---------- |
+   * ================================================
+   */
 
   /*
    * substituteColors() with default: <String[][]> theme, <boolean> reset
@@ -178,7 +178,7 @@ public class DellaPortaCipher {
     return substituteColors(DEFAULT_THEME, source);
   }
 
-    /*
+  /*
    * substituteColors() with default: <boolean> reset
    */
   public static String substituteColors(String[][] theme, String source) {
@@ -1003,22 +1003,11 @@ public class DellaPortaCipher {
       main: while (true) 
       {
         
-        /*
-         * FILE WRITING:
-         * 
-         * Create an output file that contains progress logs as the program ran or
-         * is running. An output file will only be updated or generated if the
-         * algorithm is running in debug mode
-         */
         // Reset debug mode to factory
         debugMode = false;
 
         // Clear old logs and begin new logs
         programLogs.clear();
-
-        // Create or locate necessary files
-        // establishFile(outputFile, false);
-        // establishFile(programLogFile, false);
 
         // User input parameters
         println("\n$text-blue ======= $text-white DELLA PORTA CIPHER $text-blue ===========================$text-reset \n");
