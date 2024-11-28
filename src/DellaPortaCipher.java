@@ -22,11 +22,30 @@
  *    a concern if running the program in debug mode.
  * 
  * ==============
+ * --- OUTPUT ---
+ * ==============
+ * 
+ * A folder called "DellaPortaOutput" will be generated in whatever
+ * working directory the application is currently being launched form.
+ * 
+ * In this folder will be the "decrypted.txt" and "programlog.txt"
+ * files that the application generates.
+ * 
+ * ==============
  * --- CONFIG --- 
  * ==============
  * 
- * Program Variables:
- *    - PORTA_MATRIX_SIZE
+ * PROGRAM_LOG_MAX_PAIRS:
+ *    Controls how many keyword/message pairs generate in the "programlog.txt"
+ *    output file. For example, if this value was set to 3, a sample of the
+ *    output will look something like this:
+ * 
+ *    {'a', 'g'},
+ *    {'h', 'd'},
+ *    {'x', 's'}
+ *    ...49
+ * 
+ * 
  */
 
  // File IO
@@ -35,10 +54,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+// General utility
 import java.util.ArrayList;
 import java.util.Scanner;
+
+// Regex
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class DellaPortaCipher {
   /*
@@ -51,31 +75,36 @@ public class DellaPortaCipher {
   final public static int PROGRAM_LOG_MAX_PAIRS = 15;
 
   // File I/O
-  final public static String OUTPUT_DIR = "/output";
-  final public static String OUTPUT_PATH = "/output/output.txt";
-  final public static String PROGRAM_LOG_PATH = "/output/programlog.txt";
+  final public static String OUTPUT_DIR = "./DellaPortaOutput";
+  final public static String OUTPUT_PATH = OUTPUT_DIR + "/decrypted.txt";
+  final public static String PROGRAM_LOG_PATH = OUTPUT_DIR + "/programlog.txt";
 
   // Output prefixes
   final public static String ERROR_PREFIX = "$text-red [ ! ] Error: ";
   final public static String DEBUG_PREFIX = "$text-cyan [ ? ] ";
   final public static String WARNING_PREFIX = "$text-yellow [ * ] ";
 
-  final public static String COLOR_TAG_PATTERN = "\\$([a-zA-Z]+)\\-?([a-zA-Z_]*)";
-
-  // Program logs
-  final public static ArrayList<String> programLogs = new ArrayList<>();
-
-  /* STATES & VARIABLES */
-
-  // Togglable
-  public static boolean debugMode = false;
-  public static boolean useConsoleColors = true;
-
   // Themes
   final public static String[][] DEFAULT_THEME = {
     {"error", "$bg-black", "$text-white"},
     {"warn", "$bg-blue", "$text-black"}
   };
+
+    /*
+   * -----------------------
+   * | States & Variables: |
+   * -----------------------
+   */
+
+  // String patterns
+  final public static String COLOR_TAG_PATTERN = "\\$([a-zA-Z]+)\\-?([a-zA-Z_]*)";
+
+  // Program logs
+  final public static ArrayList<String> programLogs = new ArrayList<>();
+
+  // Togglable
+  public static boolean debugMode = false;
+  public static boolean useConsoleColors = false;
 
   /*
    * Console colors
@@ -123,14 +152,48 @@ public class DellaPortaCipher {
     {"bright_white", "\u001B[107m"}
   };
 
+
+  /*
+   * ===============================
+   * | ---------- ENUMS ---------- |
+   * ===============================
+   */
+  
+  public static enum InputValidation 
+  {
+    VALID,
+    INVALID
+  }
+
+  /*
+  * ================================================
+  * | ---------- STRING & REGEX METHODS ---------- |
+  * ================================================
+  */
+
+  /*
+   * substituteColors() with default: <String[][]> theme, <boolean> reset
+   */
   public static String substituteColors(String source) {
     return substituteColors(DEFAULT_THEME, source);
   }
 
+    /*
+   * substituteColors() with default: <boolean> reset
+   */
   public static String substituteColors(String[][] theme, String source) {
     return substituteColors(theme, source, true);
   }
 
+  /*
+   * substituteColors(<String[][]> theme, String source, <boolean> reset):
+   * 
+   * Takes an input string and parses it for the tokens: "$colorType-colorValue"
+   * or "$colorSet". Replaces those tokens with their respective color values inside the
+   * TEXT_COLORS and BG_COLORS arrays, and then substitutes them in the newly built 
+   * string.
+   * 
+   */
   public static String substituteColors(String[][] theme, String source, boolean reset) {
     if (source == null) return "";
 
@@ -178,18 +241,22 @@ public class DellaPortaCipher {
 
           colorType = "theme";
 
-          // replace "bg-color" and "bg-text" with their literal console colors, and combine them
+          // replace "bg-color" and "text-color" with their literal console colors, and combine them
           String bgColor = substituteColors(theme, themeTokenData[1], false);
           String textColor = substituteColors(theme, themeTokenData[2], false);
 
+          // check if either of them is missing in the theme declaration
           boolean bgExists = !bgColor.equals("");
           boolean textExists = !textColor.equals("");
 
+          // bg-color by default
           colorValue = bgColor;
 
+          // if both exist, combine them
           if (bgExists && textExists) {
             colorValue += textColor;
 
+          // if only text-color exists, then re-assign to text-color
           } else if (textExists) {
             colorValue = textColor;
           }
@@ -215,31 +282,46 @@ public class DellaPortaCipher {
       build += source.substring(lastStart, sourceLen);
 
     // return final build and append reset, so colors don't carry over to the next print
-    return unescapeColorTag(build) + (reset ? getColor(TEXT_COLORS, "reset") : "");
+    return unescapeColorTag(build) 
+      + (reset ? getColor(TEXT_COLORS, "reset") : "");
   }
 
+  /*
+   * escapeColorTag(<String> str):
+   * 
+   * Escapes the "$colorType-colorValue" tokens in
+   * a given string by using the "/" character
+   * 
+   * Ex:
+   *    escapeColorTag("/$text-green hello world") -> "\0esc hello world"
+   */
   public static String escapeColorTag(String str) {
     return str.replaceAll("/\\$", "\0esc");
   }
 
+  /*
+   * unescapeColorTag(<String> str):
+   * 
+   * Unescapes an already escaped string and returns the 
+   * intended text.
+   * 
+   * Ex:
+   *    unescapeColorTag(escapeColorTag("/$text-green hello world")) -> "$text-green hello world"
+   */
   public static String unescapeColorTag(String str) {
     return str.replaceAll("\0esc", "\\$");
   }
 
+  /*
+   * replaceColorTags(<Object> message):
+   * 
+   * Replaces all "$colorType-colorValue" tokens with an
+   * empty string - used when the system does not support
+   * console colors
+   */
   public static String replaceColorTags(Object message) {
     String text = "" + message;
     return text.replaceAll(COLOR_TAG_PATTERN, "");
-  }
-
-  /*
-   * ---------
-   * | Enums |
-   * ---------
-   */
-  public static enum InputValidation 
-  {
-    VALID,
-    INVALID
   }
 
   /*
@@ -446,25 +528,29 @@ public class DellaPortaCipher {
     return answer;
   }
 
-  /*
-   * getPath(<String> path):
-   * 
-   * Get the absolute path based on the PATH_NAME constant defined in the class.
-   * 
-   * @param path: the relative path to the java file being executed
-   * @returns: <String> absolutePath
-   */
-  public static String getPath(String path) {
-    String dir = System.getProperty("user.dir"); 
-    return dir + path;
-  }
-
 
   /*
    * ======================================
    * | ---------- FILE METHODS ---------- |
    * ======================================
    */
+
+
+  /*
+   * getOutputDir():
+   * 
+   * Locate the main program output directory. If one doesn't
+   * exist, then create a new one and return it.
+   */
+  public static File getOutputDir() {
+    File outputDir = new File(OUTPUT_DIR);
+    // Locate or create output folder directory
+    if (!outputDir.exists()) {
+      outputDir.mkdir();
+    }
+
+    return outputDir;
+  }
 
   /*
    * establishFile(<File> file, <boolean> required):
@@ -485,6 +571,9 @@ public class DellaPortaCipher {
 
     try 
     {
+      // ensure the output directory always exists
+      getOutputDir();
+
       /*
        * check if the file is required and the file doesn't exist
        * if true: create the file and exit
@@ -543,6 +632,8 @@ public class DellaPortaCipher {
     // write the new modified input source to the output file
     try 
     {
+      establishFile(file, false);
+
       // create the file writer & buffered writer to write to the output file
       FileWriter fw = new FileWriter(file.getAbsoluteFile(), append);
 
@@ -760,13 +851,25 @@ public class DellaPortaCipher {
    * ================================================
    */
 
-   public static String getColor(String[][] colorList, String name) {
+  /*
+   * getColor(<String[][]> colorList, <String> name):
+   * 
+   * Returns an ASCII console color from a given
+   * color list
+   */
+  public static String getColor(String[][] colorList, String name) {
     for (String[] colorData : colorList)
       if (name.equals(colorData[0])) return colorData[1];
 
     return "[color not found]";
   }
 
+  /*
+   * getThemeToken(<String[][]> theme, String token):
+   * 
+   * Returns a given theme token from a selected
+   * theme array
+   */
   public static String[] getThemeToken(String[][] theme, String token) {
     for (String[] themeData : theme)
       if (token.equals(themeData[0])) return themeData;
@@ -880,14 +983,10 @@ public class DellaPortaCipher {
   public static void main(String[] args) 
   {
     // Locate output files
-    File outputFile = new File(getPath(OUTPUT_PATH));
-    File programLogFile = new File(getPath(PROGRAM_LOG_PATH));
-    File outputDir = new File(getPath(OUTPUT_DIR));
+    File outputFile = new File(OUTPUT_PATH);
+    File programLogFile = new File(PROGRAM_LOG_PATH);
 
-    // Locate or create output folder directory
-    if (!outputDir.exists()) {
-      outputDir.mkdir();
-    }
+		// System.out.println("Begin: " + FileSystems.getDefault().getPath("/DellaPortaOutput/PortaTest.txt"));
 
     // Set global command-line settings
     switch (args.length) {
@@ -918,8 +1017,8 @@ public class DellaPortaCipher {
         programLogs.clear();
 
         // Create or locate necessary files
-        establishFile(outputFile, false);
-        establishFile(programLogFile, false);
+        // establishFile(outputFile, false);
+        // establishFile(programLogFile, false);
 
         // User input parameters
         println("\n$text-blue ======= $text-white DELLA PORTA CIPHER $text-blue ===========================$text-reset \n");
