@@ -2,7 +2,7 @@
  * Authors: Will, Jaylen, Alex
  * Written: 11/22/2024
  * 
- * DELLA PORTA CIPHER - "Shifting Method"
+ * DELLA PORTA CIPHER - "The Shifting Method"
  * 
  * ============
  * --- INFO ---

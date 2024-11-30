@@ -3,7 +3,7 @@
 
 [The Della Porta cipher](https://sites.google.com/site/cryptocrackprogram/user-guide/cipher-types/substitution/porta) is an cryptography process that allows one to encrypt or decrypt plain text into a readable or obfuscated form.
 
-This is our Java implementation of the algorithm for doing so, created as a college project by Will, Jaylen, and Alex. We call it the *"Shifting Method"*.
+This is our Java implementation of the algorithm for doing so, created as a college project by Will, Jaylen, and Alex. We call it *"The Shifting Method"*.
 
 ## Compilation
 
