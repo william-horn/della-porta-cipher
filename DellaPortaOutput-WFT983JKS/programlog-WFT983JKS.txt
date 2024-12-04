@@ -4,46 +4,46 @@
 Waiting for user input...
 File 'programlog-WFT983JKS.txt' already exists
 Set debug mode to: true
-Set message to: "The quick brown fox jumped over the lazy dog"
-Set keyword to: "science"
+Set message to: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae mollitia, qui iusto voluptatibus provident harum cupiditate ratione debitis natus nobis!"
+Set keyword to: "moon"
 Preparing to convert message...
 Preparing to create keyword/message pairs array...
 
-{ t, s }
-{ h, c }
-{ e, i }
+{ l, m }
+{ o, o }
+{ r, o }
+{ e, n }
+{ m, m }
 {  ,   }
-{ q, e }
-{ u, n }
-{ i, c }
-{ c, e }
-{ k, s }
+{ i, o }
+{ p, o }
+{ s, n }
+{ u, m }
+{ m, o }
 {  ,   }
-{ b, c }
-{ r, i }
-{ o, e }
-{ w, n }
-{ n, c }
-...29
+{ d, o }
+{ o, n }
+{ l, m }
+...142
 
 Preparing to iterate over keywordMessagePairs to find letter compliments...
 
-t -> k
-h -> v
-e -> v
+l -> r
+o -> h
+r -> k
+e -> x
+m -> s
   ->  
-q -> b
+i -> p
+p -> i
+s -> m
 u -> b
-i -> w
-c -> r
-k -> t
+m -> t
   ->  
-b -> p
-r -> a
-o -> m
-w -> d
-n -> m
-...29
+d -> x
+o -> i
+l -> r
+...142
 
 File 'decrypted-WFT983JKS.txt' already exists
 END

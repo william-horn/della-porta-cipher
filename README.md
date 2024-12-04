@@ -7,11 +7,11 @@ This is our Java implementation of the algorithm for doing so, created as a coll
 
 ## Compilation
 
-To compile the Java file, simply `git clone` this repository and open enter :
+To compile the Java file, simply `git clone` this repository and enter this command in your terminal in the project directory:
 
 `java src/DellaPortaCipher.java`
 
-in the command line. If your system supports ASCII console colors, then you can run the command with a `colors` command argument:
+If your system supports ASCII console colors, then you can run the command with a `colors` command argument:
 
 `java src/DellaPortaCipher.java colors`
 
@@ -21,4 +21,4 @@ and your command line should now render as:
 
 <br>
 
-For more information on the process behind our algorithm, visit our [webpage here](https://will-blog-sigma.vercel.app/). 
+For more information on the process behind our algorithm, visit our [website here](https://will-blog-sigma.vercel.app/). 
