@@ -54,14 +54,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
-// General utility
 import java.util.ArrayList;
 import java.util.Scanner;
-
-// Regex
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 
 public class DellaPortaCipher {
@@ -178,9 +175,9 @@ public class DellaPortaCipher {
     return substituteColors(DEFAULT_THEME, source);
   }
 
-    /*
-   * substituteColors() with default: <boolean> reset
-   */
+  /*
+  * substituteColors() with default: <boolean> reset
+  */
   public static String substituteColors(String[][] theme, String source) {
     return substituteColors(theme, source, true);
   }
