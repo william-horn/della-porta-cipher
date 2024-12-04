@@ -4,148 +4,46 @@
 Waiting for user input...
 File 'programlog-WFT983JKS.txt' already exists
 Set debug mode to: true
-Set message to: "Somewhere over the rainbow"
-Set keyword to: "lorem"
+Set message to: "The quick brown fox jumped over the lazy dog"
+Set keyword to: "science"
 Preparing to convert message...
 Preparing to create keyword/message pairs array...
 
-{ s, l }
-{ o, o }
-{ m, r }
-{ e, e }
-{ w, m }
-{ h, l }
-{ e, o }
-{ r, r }
-{ e, e }
+{ t, s }
+{ h, c }
+{ e, i }
 {  ,   }
-{ o, m }
-{ v, l }
-{ e, o }
-{ r, r }
+{ q, e }
+{ u, n }
+{ i, c }
+{ c, e }
+{ k, s }
 {  ,   }
-...11
+{ b, c }
+{ r, i }
+{ o, e }
+{ w, n }
+{ n, c }
+...29
 
 Preparing to iterate over keywordMessagePairs to find letter compliments...
 
-s -> a
-o -> h
-m -> u
-e -> t
+t -> k
+h -> v
+e -> v
+  ->  
+q -> b
+u -> b
+i -> w
+c -> r
+k -> t
+  ->  
+b -> p
+r -> a
+o -> m
 w -> d
-h -> z
-e -> y
-r -> j
-e -> t
-  ->  
-o -> i
-v -> d
-e -> y
-r -> j
-  ->  
-...11
-
-File 'decrypted-WFT983JKS.txt' already exists
-END
-
-For more info, visit: https://della-porta-cipher.vercel.app/
-
------ START ----------------------------
-
-Waiting for user input...
-File 'programlog-WFT983JKS.txt' already exists
-Set debug mode to: true
-Set message to: "One small step for man, one giant leap for mankind"
-Set keyword to: "lorem"
-Preparing to convert message...
-Preparing to create keyword/message pairs array...
-
-{ o, l }
-{ n, o }
-{ e, r }
-{  ,   }
-{ s, e }
-{ m, m }
-{ a, l }
-{ l, o }
-{ l, r }
-{  ,   }
-{ s, e }
-{ t, m }
-{ e, l }
-{ p, o }
-{  ,   }
-...35
-
-Preparing to iterate over keywordMessagePairs to find letter compliments...
-
-o -> j
-n -> g
-e -> z
-  ->  
-s -> d
-m -> s
-a -> s
-l -> s
-l -> t
-  ->  
-s -> d
-t -> a
-e -> w
-p -> i
-  ->  
-...35
-
-File 'decrypted-WFT983JKS.txt' already exists
-END
-
-For more info, visit: https://della-porta-cipher.vercel.app/
-
------ START ----------------------------
-
-Waiting for user input...
-File 'programlog-WFT983JKS.txt' already exists
-Set debug mode to: true
-Set message to: "A long time ago, in a galaxy far far away"
-Set keyword to: "cloud"
-Preparing to convert message...
-Preparing to create keyword/message pairs array...
-
-{ a, c }
-{  ,   }
-{ l, l }
-{ o, o }
-{ n, u }
-{ g, d }
-{  ,   }
-{ t, c }
-{ i, l }
-{ m, o }
-{ e, u }
-{  ,   }
-{ a, d }
-{ g, c }
-{ o, l }
-...26
-
-Preparing to iterate over keywordMessagePairs to find letter compliments...
-
-a -> o
-  ->  
-l -> q
-o -> h
-n -> d
-g -> u
-  ->  
-t -> f
-i -> n
-m -> t
-e -> o
-  ->  
-a -> o
-g -> u
-o -> j
-...26
+n -> m
+...29
 
 File 'decrypted-WFT983JKS.txt' already exists
 END

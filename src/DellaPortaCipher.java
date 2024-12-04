@@ -1141,6 +1141,7 @@ public class DellaPortaCipher {
           new String[] {
             "Run Again",
             "Open Program Logs",
+            "Toggle Colors",
             "Exit"
           }
         );
@@ -1159,6 +1160,10 @@ public class DellaPortaCipher {
           }
 
           case 3:
+            useConsoleColors = !useConsoleColors;
+            break;
+
+          case 4:
             break main;
         }
       }
