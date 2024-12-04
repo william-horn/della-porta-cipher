@@ -11,8 +11,8 @@
  * This application takes text input from the user to encrypt
  * or decrypt according to the Della Porta cipher. It has several
  * debug options, and output can be read through the terminal
- * or through the output text files found in the directory of the
- * application.
+ * or through the output text files found in the directory that the
+ * application was launched from.
  * 
  * NOTE: 
  *    if running on Windows on a system earlier than Windows 11, notepad
@@ -25,15 +25,38 @@
  * --- OUTPUT ---
  * ==============
  * 
- * A folder called "DellaPortaOutput" will be generated in whatever
+ * A folder called "DellaPortaOutput-WFT983JKS" will be generated in whatever
  * working directory the application is currently being launched form.
  * 
- * In this folder will be the "decrypted.txt" and "programlog.txt"
- * files that the application generates.
+ * In this folder will be the "decrypted-WFT983JKS.txt" and "programlog-WFT983JKS.txt"
+ * files that the application generates. The random alphanumeric characters at the end 
+ * are an added security measure as to not over-write any existing files that may exist 
+ * under the same directory.
  * 
  * ==============
  * --- CONFIG --- 
  * ==============
+ * 
+ * debugMode:
+ *    Running the application in 'debugMode' will enable the program to perform write
+ *    operations to the relevant output text files. When enabled, the application will give
+ *    detailed descriptions of it's runtime progress and log them to the "programlog-WFT983JKS.txt"
+ *    file.
+ * 
+ *    When debugMode is enabled, it will also output the decrypted cipher to a 
+ *    "decrypted-WFT983JKS.txt" file, in the same directory as the programlog file.
+ * 
+ *    debugMode is disabled by default.
+ * 
+ * useConsoleColors:
+ *    When enabled, the application will run in "color" mode. This will add text and background
+ *    colors to the terminal interface if the terminal can support the ASCII color codes.
+ * 
+ *    The program does not detect if it is able to run in color mode, so the user must manually
+ *    choose to start the program in color mode using the "colors" command line argument. For 
+ *    example, this is how you could boot the program in color mode:
+ * 
+ *      java ../DellaPortaCipher.java colors
  * 
  * PROGRAM_LOG_MAX_PAIRS:
  *    Controls how many keyword/message pairs generate in the "programlog.txt"
@@ -75,14 +98,19 @@ public class DellaPortaCipher {
   final public static int PROGRAM_LOG_MAX_PAIRS = 15;
 
   // File I/O
-  final public static String OUTPUT_DIR = "./DellaPortaOutput";
-  final public static String OUTPUT_PATH = OUTPUT_DIR + "/decrypted.txt";
-  final public static String PROGRAM_LOG_PATH = OUTPUT_DIR + "/programlog.txt";
+  final public static String UNIQUE_FILE_NAME_KEY = "WFT983JKS";
+
+  final public static String OUTPUT_DIR = "./DellaPortaOutput-" + UNIQUE_FILE_NAME_KEY;
+  final public static String OUTPUT_PATH = OUTPUT_DIR + "/decrypted-" + UNIQUE_FILE_NAME_KEY + ".txt";
+  final public static String PROGRAM_LOG_PATH = OUTPUT_DIR + "/programlog-" + UNIQUE_FILE_NAME_KEY + ".txt";
 
   // Output prefixes
   final public static String ERROR_PREFIX = "$text-red [ ! ] Error: ";
   final public static String DEBUG_PREFIX = "$text-cyan [ ? ] ";
   final public static String WARNING_PREFIX = "$text-yellow [ * ] ";
+
+  // Other
+  final public static String WEBSITE_LINK = "https://della-porta-cipher.vercel.app/";
 
   // Themes
   final public static String[][] DEFAULT_THEME = 
@@ -326,7 +354,7 @@ public class DellaPortaCipher {
    */
   public static String replaceColorTags(Object message) {
     String text = "" + message;
-    return text.replaceAll(COLOR_TAG_PATTERN, "");
+    return text.replaceAll(COLOR_TAG_PATTERN + " ", "");
   }
 
   /*
@@ -433,9 +461,9 @@ public class DellaPortaCipher {
     println("");
 
     // display the menu title
-    println("$text-blue -".repeat(padding));
+    println("$text-blue " + "-".repeat(padding));
     printf("$text-blue | $text-white %s$text-blue  |\n", title);
-    println("$text-blue -".repeat(padding) + "\n");
+    println("$text-blue " + "-".repeat(padding) + "\n");
 
     // display the menu options
     for (int i = 1; i <= choices.length; i++)
@@ -645,13 +673,16 @@ public class DellaPortaCipher {
       establishFile(file, false);
 
       // create the file writer & buffered writer to write to the output file
-      FileWriter fw = new FileWriter(file.getAbsoluteFile(), append);
+      FileWriter fileWriter = new FileWriter(
+        file.getAbsoluteFile(), 
+        append
+      );
 
       // create BufferWriter try-with-resources block to auto-close connection
-      try (BufferedWriter bw = new BufferedWriter(fw)) {
+      try (BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
         // write to the output file and close the connection
-        bw.write(text);
-        // bw.flush();
+        bufferedWriter.write(text);
+        // writer.flush();
 
       } catch (IOException e) {
         addErrorLog("Issue writing to file: " + e.getMessage());
@@ -1002,8 +1033,6 @@ public class DellaPortaCipher {
     File outputFile = new File(OUTPUT_PATH);
     File programLogFile = new File(PROGRAM_LOG_PATH);
 
-		// System.out.println("Begin: " + FileSystems.getDefault().getPath("/DellaPortaOutput/PortaTest.txt"));
-
     // Set global command-line settings
     switch (args.length) {
       case 1: {
@@ -1032,7 +1061,7 @@ public class DellaPortaCipher {
 
         println(WARNING_PREFIX + "Press 'Enter' without typing a value to choose defaults.\n");
         println(DEBUG_PREFIX + "For more info on settings, read the 'CONFIG' comment at the top of the source code.\n");
-        println(DEBUG_PREFIX + "To learn more about the Della Porta cipher, visit our webpage: https://will-blog-sigma.vercel.app\n");
+        println(DEBUG_PREFIX + "To learn more about the Della Porta cipher, visit our website: " + WEBSITE_LINK + "\n");
         println("$text-blue ======================================================$text-reset \n");
 
 
@@ -1103,7 +1132,7 @@ public class DellaPortaCipher {
 
         // End of the main program logic
         programLogs.add("END");
-        programLogs.add("\nFor more info, visit: https://will-blog-sigma.vercel.app/");
+        programLogs.add("\nFor more info, visit: " + WEBSITE_LINK);
         updateLogs(programLogFile, true);
 
         // Prompt the user with some end-of-run options
