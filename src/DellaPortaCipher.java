@@ -2,7 +2,7 @@
  * Authors: Will, Jaylen, Alex
  * Written: 11/22/2024
  * 
- * DELLA PORTA CIPHER - "Shifting Method"
+ * DELLA PORTA CIPHER - "The Shifting Method"
  * 
  * ============
  * --- INFO ---
@@ -11,8 +11,8 @@
  * This application takes text input from the user to encrypt
  * or decrypt according to the Della Porta cipher. It has several
  * debug options, and output can be read through the terminal
- * or through the output text files found in the directory of the
- * application.
+ * or through the output text files found in the directory that the
+ * application was launched from.
  * 
  * NOTE: 
  *    if running on Windows on a system earlier than Windows 11, notepad
@@ -25,15 +25,38 @@
  * --- OUTPUT ---
  * ==============
  * 
- * A folder called "DellaPortaOutput" will be generated in whatever
+ * A folder called "DellaPortaOutput-WFT983JKS" will be generated in whatever
  * working directory the application is currently being launched form.
  * 
- * In this folder will be the "decrypted.txt" and "programlog.txt"
- * files that the application generates.
+ * In this folder will be the "decrypted-WFT983JKS.txt" and "programlog-WFT983JKS.txt"
+ * files that the application generates. The random alphanumeric characters at the end 
+ * are an added security measure as to not over-write any existing files that may exist 
+ * under the same directory.
  * 
  * ==============
  * --- CONFIG --- 
  * ==============
+ * 
+ * debugMode:
+ *    Running the application in 'debugMode' will enable the program to perform write
+ *    operations to the relevant output text files. When enabled, the application will give
+ *    detailed descriptions of it's runtime progress and log them to the "programlog-WFT983JKS.txt"
+ *    file.
+ * 
+ *    When debugMode is enabled, it will also output the decrypted cipher to a 
+ *    "decrypted-WFT983JKS.txt" file, in the same directory as the programlog file.
+ * 
+ *    debugMode is disabled by default.
+ * 
+ * useConsoleColors:
+ *    When enabled, the application will run in "color" mode. This will add text and background
+ *    colors to the terminal interface if the terminal can support the ASCII color codes.
+ * 
+ *    The program does not detect if it is able to run in color mode, so the user must manually
+ *    choose to start the program in color mode using the "colors" command line argument. For 
+ *    example, this is how you could boot the program in color mode:
+ * 
+ *      java ../DellaPortaCipher.java colors
  * 
  * PROGRAM_LOG_MAX_PAIRS:
  *    Controls how many keyword/message pairs generate in the "programlog.txt"
@@ -72,22 +95,28 @@ public class DellaPortaCipher {
   final public static int PROGRAM_LOG_MAX_PAIRS = 15;
 
   // File I/O
-  final public static String OUTPUT_DIR = "./DellaPortaOutput";
-  final public static String OUTPUT_PATH = OUTPUT_DIR + "/decrypted.txt";
-  final public static String PROGRAM_LOG_PATH = OUTPUT_DIR + "/programlog.txt";
+  final public static String UNIQUE_FILE_NAME_KEY = "WFT983JKS";
+
+  final public static String OUTPUT_DIR = "./DellaPortaOutput-" + UNIQUE_FILE_NAME_KEY;
+  final public static String OUTPUT_PATH = OUTPUT_DIR + "/decrypted-" + UNIQUE_FILE_NAME_KEY + ".txt";
+  final public static String PROGRAM_LOG_PATH = OUTPUT_DIR + "/programlog-" + UNIQUE_FILE_NAME_KEY + ".txt";
 
   // Output prefixes
   final public static String ERROR_PREFIX = "$text-red [ ! ] Error: ";
   final public static String DEBUG_PREFIX = "$text-cyan [ ? ] ";
   final public static String WARNING_PREFIX = "$text-yellow [ * ] ";
 
+  // Other
+  final public static String WEBSITE_LINK = "https://della-porta-cipher.vercel.app/";
+
   // Themes
-  final public static String[][] DEFAULT_THEME = {
+  final public static String[][] DEFAULT_THEME = 
+  {
     {"error", "$bg-black", "$text-white"},
     {"warn", "$bg-blue", "$text-black"}
   };
 
-    /*
+  /*
    * -----------------------
    * | States & Variables: |
    * -----------------------
@@ -107,7 +136,8 @@ public class DellaPortaCipher {
    * Console colors
    * Source: https://nonvalet.com/posts/20210413_java_console_colors/#:~:text=To%20change%20terminal%20colors%2C%20you,names%20for%20better%20code%20readability.
    */
-  final public static String[][] TEXT_COLORS = {
+  final public static String[][] TEXT_COLORS = 
+  {
     {"reset", "\u001B[0m"},
 
     {"black", "\u001B[30m"},
@@ -129,7 +159,8 @@ public class DellaPortaCipher {
     {"bright_white", "\u001B[97m"},
   };
 
-  final public static String[][] BG_COLORS = {
+  final public static String[][] BG_COLORS = 
+  {
     {"black", "\u001B[40m"},
     {"red", "\u001B[41m"},
     {"green", "\u001B[42m"},
@@ -163,10 +194,10 @@ public class DellaPortaCipher {
   }
 
   /*
-  * ================================================
-  * | ---------- STRING & REGEX METHODS ---------- |
-  * ================================================
-  */
+   * ================================================
+   * | ---------- STRING & REGEX METHODS ---------- |
+   * ================================================
+   */
 
   /*
    * substituteColors() with default: <String[][]> theme, <boolean> reset
@@ -176,8 +207,8 @@ public class DellaPortaCipher {
   }
 
   /*
-  * substituteColors() with default: <boolean> reset
-  */
+   * substituteColors() with default: <boolean> reset
+   */
   public static String substituteColors(String[][] theme, String source) {
     return substituteColors(theme, source, true);
   }
@@ -191,7 +222,8 @@ public class DellaPortaCipher {
    * string.
    * 
    */
-  public static String substituteColors(String[][] theme, String source, boolean reset) {
+  public static String substituteColors(String[][] theme, String source, boolean reset) 
+  {
     if (source == null) return "";
 
     // escape the $ symbol with '/'
@@ -232,7 +264,8 @@ public class DellaPortaCipher {
          *    - recursively call method for "bg-color" and "text-color" to retrieve
          *      their values.
          */
-        if (colorValue.equals("")) {
+        if (colorValue.equals("")) 
+        {
           // get theme data in form: { "key", "bg-color", "text-color" }
           String[] themeTokenData = getThemeToken(theme, colorType);
 
@@ -318,7 +351,7 @@ public class DellaPortaCipher {
    */
   public static String replaceColorTags(Object message) {
     String text = "" + message;
-    return text.replaceAll(COLOR_TAG_PATTERN, "");
+    return text.replaceAll(COLOR_TAG_PATTERN + " ", "");
   }
 
   /*
@@ -332,7 +365,8 @@ public class DellaPortaCipher {
    * 
    * Shorthand for: System.out.println(...);
    */
-  public static void println(Object message) {
+  public static void println(Object message) 
+  {
     if (useConsoleColors)
       System.out.println(substituteColors("" + message));
     else
@@ -344,7 +378,8 @@ public class DellaPortaCipher {
    * 
    * Shorthand for: System.out.print(...);
    */
-  public static void print(Object message) {
+  public static void print(Object message) 
+  {
     if (useConsoleColors)
       System.out.print(substituteColors("" + message));
     else 
@@ -356,7 +391,8 @@ public class DellaPortaCipher {
    * 
    * Shorthand for: System.out.printf(...);
    */
-  public static void printf(String template, Object ...args) {
+  public static void printf(String template, Object ...args) 
+  {
     if (useConsoleColors)
       System.out.printf(substituteColors("" + template), args);
     else
@@ -390,7 +426,8 @@ public class DellaPortaCipher {
    * @param <Scanner> input: The scanner object to prompt the user input
    * @param <String> message: The message to display before requesting the input
    */
-  public static String promptMessage(Scanner input, String message, String def) {
+  public static String promptMessage(Scanner input, String message, String def) 
+  {
     print("> $text-green " + message);
     String submission = input.nextLine();
 
@@ -421,9 +458,9 @@ public class DellaPortaCipher {
     println("");
 
     // display the menu title
-    println("$text-blue -".repeat(padding));
+    println("$text-blue " + "-".repeat(padding));
     printf("$text-blue | $text-white %s$text-blue  |\n", title);
-    println("$text-blue -".repeat(padding) + "\n");
+    println("$text-blue " + "-".repeat(padding) + "\n");
 
     // display the menu options
     for (int i = 1; i <= choices.length; i++)
@@ -539,7 +576,8 @@ public class DellaPortaCipher {
    * Locate the main program output directory. If one doesn't
    * exist, then create a new one and return it.
    */
-  public static File getOutputDir() {
+  public static File getOutputDir() 
+  {
     File outputDir = new File(OUTPUT_DIR);
     // Locate or create output folder directory
     if (!outputDir.exists()) {
@@ -632,13 +670,16 @@ public class DellaPortaCipher {
       establishFile(file, false);
 
       // create the file writer & buffered writer to write to the output file
-      FileWriter fw = new FileWriter(file.getAbsoluteFile(), append);
+      FileWriter fileWriter = new FileWriter(
+        file.getAbsoluteFile(), 
+        append
+      );
 
       // create BufferWriter try-with-resources block to auto-close connection
-      try (BufferedWriter bw = new BufferedWriter(fw)) {
+      try (BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
         // write to the output file and close the connection
-        bw.write(text);
-        // bw.flush();
+        bufferedWriter.write(text);
+        // writer.flush();
 
       } catch (IOException e) {
         addErrorLog("Issue writing to file: " + e.getMessage());
@@ -722,7 +763,8 @@ public class DellaPortaCipher {
     }
 
     // For loop that pairs the characters of the keywordString and the message into an array
-    for (int i = 0; i < keywordPairs.length; i++){
+    for (int i = 0; i < keywordPairs.length; i++)
+    {
       // Copies each letter of the message string along the first column
       keywordPairs[i][0] = message.charAt(i);
       // Copies each letter of the keyword string string along the second column
@@ -854,7 +896,8 @@ public class DellaPortaCipher {
    * Returns an ASCII console color from a given
    * color list
    */
-  public static String getColor(String[][] colorList, String name) {
+  public static String getColor(String[][] colorList, String name) 
+  {
     for (String[] colorData : colorList)
       if (name.equals(colorData[0])) return colorData[1];
 
@@ -867,7 +910,8 @@ public class DellaPortaCipher {
    * Returns a given theme token from a selected
    * theme array
    */
-  public static String[] getThemeToken(String[][] theme, String token) {
+  public static String[] getThemeToken(String[][] theme, String token) 
+  {
     for (String[] themeData : theme)
       if (token.equals(themeData[0])) return themeData;
 
@@ -927,7 +971,8 @@ public class DellaPortaCipher {
     }
 
     // if the string contains non-alphabet characters, invalidate the string
-    for (int i = 0; i < text.length(); i++) {
+    for (int i = 0; i < text.length(); i++) 
+    {
       char letter = text.charAt(i);
       if (!Character.isLetter(letter)) {
         addErrorLog("Found non-alphabet character in text: '" + letter + "'");
@@ -944,7 +989,8 @@ public class DellaPortaCipher {
    * 
    * Returns a random default message to use
    */
-  public static String chooseRandomDefaultMessage() {
+  public static String chooseRandomDefaultMessage() 
+  {
     String[] choices = {
       "The quick brown fox jumped over the lazy dog",
       "Somewhere over the rainbow",
@@ -963,7 +1009,8 @@ public class DellaPortaCipher {
    * 
    * Returns a random default keyword to use
    */
-  public static String chooseRandomDefaultKeyword() {
+  public static String chooseRandomDefaultKeyword() 
+  {
     String[] choices = {
       "fox",
       "cloud",
@@ -983,8 +1030,6 @@ public class DellaPortaCipher {
     File outputFile = new File(OUTPUT_PATH);
     File programLogFile = new File(PROGRAM_LOG_PATH);
 
-		// System.out.println("Begin: " + FileSystems.getDefault().getPath("/DellaPortaOutput/PortaTest.txt"));
-
     // Set global command-line settings
     switch (args.length) {
       case 1: {
@@ -1000,22 +1045,11 @@ public class DellaPortaCipher {
       main: while (true) 
       {
         
-        /*
-         * FILE WRITING:
-         * 
-         * Create an output file that contains progress logs as the program ran or
-         * is running. An output file will only be updated or generated if the
-         * algorithm is running in debug mode
-         */
         // Reset debug mode to factory
         debugMode = false;
 
         // Clear old logs and begin new logs
         programLogs.clear();
-
-        // Create or locate necessary files
-        // establishFile(outputFile, false);
-        // establishFile(programLogFile, false);
 
         // User input parameters
         println("\n$text-blue ======= $text-white DELLA PORTA CIPHER $text-blue ===========================$text-reset \n");
@@ -1024,7 +1058,7 @@ public class DellaPortaCipher {
 
         println(WARNING_PREFIX + "Press 'Enter' without typing a value to choose defaults.\n");
         println(DEBUG_PREFIX + "For more info on settings, read the 'CONFIG' comment at the top of the source code.\n");
-        println(DEBUG_PREFIX + "To learn more about the Della Porta cipher, visit our webpage: https://will-blog-sigma.vercel.app\n");
+        println(DEBUG_PREFIX + "To learn more about the Della Porta cipher, visit our website: " + WEBSITE_LINK + "\n");
         println("$text-blue ======================================================$text-reset \n");
 
 
@@ -1039,7 +1073,8 @@ public class DellaPortaCipher {
          *        - if true, then programlogs.txt resets every program re-run 
          *        - if false, then programlogs.txt is appended every program re-run
          */
-        if (debugMode) {
+        if (debugMode) 
+        {
           boolean resetProgramLogs = promptBoolean(input, "Reset program logs", true);
 
           writeFile(
@@ -1094,7 +1129,7 @@ public class DellaPortaCipher {
 
         // End of the main program logic
         programLogs.add("END");
-        programLogs.add("\nFor more info, visit: https://will-blog-sigma.vercel.app/");
+        programLogs.add("\nFor more info, visit: " + WEBSITE_LINK);
         updateLogs(programLogFile, true);
 
         // Prompt the user with some end-of-run options
@@ -1111,7 +1146,8 @@ public class DellaPortaCipher {
         );
 
         // if the user choose to exit the program
-        switch (menuItem) {
+        switch (menuItem) 
+        {
           case 2: {
             try { 
               Desktop.getDesktop().open(programLogFile); 
